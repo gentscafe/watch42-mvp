@@ -8,7 +8,7 @@ import random
 # 1. CONFIGURAZIONE PAGINA
 st.set_page_config(page_title="watch42 | Analytics", layout="wide", initial_sidebar_state="expanded")
 
-# 2. UI STYLE - ATLAS ENTERPRISE (v5.3 Cleaned)
+# 2. UI STYLE - TOTAL ATLAS DESIGN (v5.4)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -28,8 +28,38 @@ st.markdown("""
     .logo-text { font-weight: 700; font-size: 1.5rem; color: #1a1a1a; letter-spacing: -1px; }
     .logo-accent { color: #d4af37; }
 
-    /* Modern Sidebar */
-    [data-testid="stSidebar"] { background-color: white !important; border-right: 1px solid #E2E8F0 !important; }
+    /* MODERN SIDEBAR DESIGN */
+    [data-testid="stSidebar"] {
+        background-color: white !important;
+        border-right: 1px solid #E2E8F0 !important;
+    }
+    
+    /* Nasconde i radio button standard e lo stile di default */
+    [data-testid="stSidebarNav"] { display: none; }
+    
+    /* Sidebar Navigation Links */
+    .nav-item {
+        padding: 12px 20px;
+        margin: 4px 15px;
+        border-radius: 12px;
+        color: #64748B;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+    }
+    .nav-item:hover {
+        background-color: #F8FAFC;
+        color: #1E293B;
+    }
+    .nav-active {
+        background-color: #F1F5F9 !important;
+        color: #1E293B !important;
+        font-weight: 600;
+    }
+    .nav-icon { margin-right: 12px; font-size: 1.1rem; }
 
     /* Atlass Cards */
     .atlass-card {
@@ -53,7 +83,6 @@ st.markdown("""
     .block-container { padding-top: 6rem !important; padding-right: 3rem !important; padding-left: 3rem !important; }
     [data-testid="stHeader"] { display: none; }
     
-    /* Insight Alert */
     .insight-box {
         background-color: #FEF9C3; border-left: 4px solid #d4af37; padding: 16px; border-radius: 8px; margin-top: 10px;
     }
@@ -84,23 +113,51 @@ if 'initialized' not in st.session_state:
     st.session_state.competitors = [create_watch(f"Brand {random.randint(1,25)}", f"Comp {i}") for i in range(1, 1500)]
     st.session_state.initialized = True
 
-# 4. SIDEBAR
+# 4. CUSTOM SIDEBAR NAVIGATION (ATLAS STYLE)
 with st.sidebar:
-    st.markdown("### Navigation")
-    view = st.radio("Reports", ["Dashboard", "Pricing Intelligence", "Design Grid", "Market Trends"], label_visibility="collapsed")
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown('<p style="color:#94A3B8; font-weight:700; font-size:0.75rem; margin-left:20px; text-transform:uppercase;">Reports</p>', unsafe_allow_html=True)
+    
+    # Gestione stato navigazione
+    if 'current_page' not in st.session_state:
+        st.session_state.current_page = "Dashboard"
+
+    def set_page(name):
+        st.session_state.current_page = name
+
+    pages = [
+        ("Dashboard", "📊"),
+        ("Pricing Intelligence", "💰"),
+        ("Design Grid", "📐"),
+        ("Market Trends", "📈")
+    ]
+
+    for name, icon in pages:
+        is_active = "nav-active" if st.session_state.current_page == name else ""
+        if st.button(f"{icon} {name}", key=f"btn_{name}", use_container_width=True, on_click=set_page, args=(name,)):
+            pass # Il cambio avviene tramite on_click
+
     st.write("---")
-    st.caption("Intelligence SaaS v5.3")
+    st.caption("Intelligence SaaS v5.4")
 
 df_all = pd.DataFrame(st.session_state.competitors)
+view = st.session_state.current_page
 
-# --- VIEWS ---
+# --- VIEWS (Integrate con lo stile Atlass) ---
 
 if view == "Dashboard":
     st.markdown("### Portfolio Overview")
     cols = st.columns(5)
     for i, w in enumerate(st.session_state.my_portfolio):
         with cols[i]:
-            st.markdown(f'<div class="atlass-card"><span class="category-badge">{w["Category"]}</span><div style="font-weight:600; margin-top:12px; color:#1E293B;">{w["Model"]}</div><div class="price-tag">€ {w["Price"]:,}</div><div style="font-size:0.75rem; color:#94A3B8; margin-top:4px;">Year: {w['Year']}</div></div>', unsafe_allow_html=True)
+            st.markdown(f"""
+                <div class="atlass-card">
+                    <span class="category-badge">{w['Category']}</span>
+                    <div style="font-weight:600; margin-top:12px; color:#1E293B;">{w['Model']}</div>
+                    <div class="price-tag">€ {w['Price']:,}</div>
+                    <div style="font-size:0.75rem; color:#94A3B8; margin-top:4px;">Year: {w['Year']}</div>
+                </div>
+            """, unsafe_allow_html=True)
 
 elif view == "Pricing Intelligence":
     col_t1, col_t2 = st.columns([2, 1])
@@ -145,13 +202,9 @@ elif view == "Design Grid":
     with col_m2:
         st.markdown(f'<div class="atlass-card" style="height:495px;"><div class="card-label">Strategic Insights</div><div class="card-value">{len(df_f_design)} Models</div><hr style="border:0; border-top:1px solid #E2E8F0; margin:20px 0;"><div style="font-size:0.9rem; color:#475569;"><b>White Space Detected:</b><br>Low competition in dimensions favored by collectors for the {sel_cat} segment.</div></div>', unsafe_allow_html=True)
 
-# --- VIEW 4: MARKET TRENDS (BARRA BIANCA RIMOSSA) ---
 elif view == "Market Trends":
     st.markdown("### Market Intelligence & Trends")
-    
-    # Filtro posizionato direttamente senza contenitori Markdown vuoti sotto
     trend_cat = st.selectbox("Market Segment", ["All Categories"] + list(df_all['Category'].unique()))
-    
     df_t = df_all.copy() if trend_cat == "All Categories" else df_all[df_all['Category'] == trend_cat]
     trends = df_t.groupby('Year')['Reserve'].mean().reset_index()
     max_yr = int(trends['Year'].max()) if not trends.empty else 2026
@@ -160,7 +213,7 @@ elif view == "Market Trends":
     c_left, c_right = st.columns([1.6, 1])
     with c_left:
         st.markdown('<div class="atlass-card">', unsafe_allow_html=True)
-        st.markdown('<div class="card-label">Power Reserve Evolution (Industrial Shift)</div>', unsafe_allow_html=True)
+        st.markdown('<div class="card-label">Power Reserve Evolution</div>', unsafe_allow_html=True)
         fig_line = px.line(trends, x='Year', y='Reserve', markers=True, color_discrete_sequence=["#d4af37"])
         fig_line.update_layout(template="plotly_white", height=400, margin=dict(l=0, r=0, t=20, b=0))
         st.plotly_chart(fig_line, use_container_width=True)
