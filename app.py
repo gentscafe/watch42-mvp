@@ -39,7 +39,7 @@ st.markdown("""
 
     /* REDUCE STREAMLIT WHITE SPACES */
     .block-container {
-        padding-top: 2rem !important;
+        padding-top: 4rem !important; /* Aumentato lo spazio bianco in alto */
         padding-bottom: 0rem !important;
     }
     
@@ -105,7 +105,7 @@ with st.sidebar:
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
-    st.header("My Brand Portfolio")
+    # Titolo "My Brand Portfolio" rimosso
     cols = st.columns(5)
     for i, watch in enumerate(st.session_state.my_portfolio):
         with cols[i]:
