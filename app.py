@@ -71,7 +71,7 @@ with st.sidebar:
     st.write("### Navigation")
     view = st.radio("Sections", ["My Watches", "Pricing Intelligence", "Design Intelligence"])
     st.write("---")
-    st.caption("Intelligence SaaS v3.1")
+    st.caption("Intelligence SaaS v3.2")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
@@ -121,48 +121,60 @@ elif view == "Pricing Intelligence":
     else:
         st.warning("No matches found.")
 
-# 7. VIEW: DESIGN INTELLIGENCE (Ultra-Clean)
+# 7. VIEW: DESIGN INTELLIGENCE (Filter Update)
 elif view == "Design Intelligence":
-    # All titles and captions removed as requested
+    col_h1, col_h2 = st.columns([1.3, 2])
     
-    col_h1, col_h2 = st.columns([2, 1])
-    with col_h2:
+    with col_h1:
+        # Filtro anno spostato a sinistra
         design_year_range = st.slider("Production Year Filter", 2015, 2025, (2018, 2024))
+    
+    with col_h2:
+        # Aggiunta filtro Categoria
+        available_cats = ["All Categories", "Diver", "Dress", "GMT", "Chronograph", "Pilot/Field", "Casual"]
+        selected_cat = st.selectbox("Market Segment Filter", available_cats)
 
     df_all = pd.DataFrame(st.session_state.competitors)
-    df_f_design = df_all[df_all['Year'].between(design_year_range[0], design_year_range[1])].copy()
     
-    # Process Matrix
-    matrix_df = df_f_design.groupby(['Diameter', 'Thickness']).size().reset_index(name='count')
-    pivot_table = matrix_df.pivot(index='Thickness', columns='Diameter', values='count').fillna(0)
+    # Applicazione filtri
+    df_f_design = df_all[df_all['Year'].between(design_year_range[0], design_year_range[1])].copy()
+    if selected_cat != "All Categories":
+        df_f_design = df_f_design[df_f_design['Category'] == selected_cat]
 
-    # Generate Heatmap
-    fig = go.Figure(data=go.Heatmap(
-        z=pivot_table.values, x=pivot_table.columns, y=pivot_table.index,
-        colorscale=[[0, '#27ae60'], [0.1, '#f1c40f'], [0.5, '#e67e22'], [1.0, '#c0392b']],
-        text=pivot_table.values, texttemplate="%{text}", textfont={"size": 14, "color": "white"},
-        hovertemplate="Diam: %{x}mm<br>Thick: %{y}mm<br>Competitors: %{z}<extra></extra>"
-    ))
+    # Matrix Data
+    if not df_f_design.empty:
+        matrix_df = df_f_design.groupby(['Diameter', 'Thickness']).size().reset_index(name='count')
+        pivot_table = matrix_df.pivot(index='Thickness', columns='Diameter', values='count').fillna(0)
 
-    fig.update_layout(xaxis_title="Diameter (mm)", yaxis_title="Thickness (mm)",
-                      template="plotly_white", height=500, margin=dict(l=0, r=0, t=10, b=0))
+        # Plot
+        fig = go.Figure(data=go.Heatmap(
+            z=pivot_table.values, x=pivot_table.columns, y=pivot_table.index,
+            colorscale=[[0, '#27ae60'], [0.1, '#f1c40f'], [0.5, '#e67e22'], [1.0, '#c0392b']],
+            text=pivot_table.values, texttemplate="%{text}", textfont={"size": 14, "color": "white"},
+            hovertemplate="Diam: %{x}mm<br>Thick: %{y}mm<br>Competitors: %{z}<extra></extra>"
+        ))
 
-    st.plotly_chart(fig, use_container_width=True)
+        fig.update_layout(xaxis_title="Diameter (mm)", yaxis_title="Thickness (mm)",
+                          template="plotly_white", height=500, margin=dict(l=0, r=0, t=10, b=0))
 
-    # Inspector Section
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.warning(f"No models found for {selected_cat} in the selected year range.")
+
+    # Inspector
     st.write("---")
     st.write("### 🔍 Cell Inspector")
     c1, c2, c3 = st.columns([1, 1, 2])
     with c1:
-        sel_diam = st.selectbox("Diameter (mm)", sorted(df_f_design['Diameter'].unique()))
+        sel_diam = st.selectbox("Diameter (mm)", sorted(df_f_design['Diameter'].unique()) if not df_f_design.empty else [0])
     with c2:
-        sel_thick = st.selectbox("Thickness (mm)", sorted(df_f_design['Thickness'].unique()))
+        sel_thick = st.selectbox("Thickness (mm)", sorted(df_f_design['Thickness'].unique()) if not df_f_design.empty else [0])
     
     cell_list = df_f_design[(df_f_design['Diameter'] == sel_diam) & (df_f_design['Thickness'] == sel_thick)]
     
-    with st.expander(f"Analysis: {len(cell_list)} models at {sel_diam}mm x {sel_thick}mm", expanded=True):
+    with st.expander(f"Analysis: {len(cell_list)} models found", expanded=True):
         if not cell_list.empty:
             st.dataframe(cell_list[["Brand", "Model", "Year", "Price", "Category"]].sort_values("Price"), 
                          use_container_width=True, hide_index=True)
         else:
-            st.info("No competitors found in this dimensional coordinate.")
+            st.info("Select a coordinate to see the list of competitor models.")
