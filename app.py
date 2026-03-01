@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
-import plotly.graph_objects as go
 import numpy as np
 import random
 
@@ -39,7 +38,7 @@ st.markdown("""
     </div>
     """, unsafe_allow_html=True)
 
-# 3. STATIC DATA GENERATION (Unified Seed 42)
+# 3. STATIC DATA GENERATION
 if 'initialized' not in st.session_state:
     random.seed(42)
     np.random.seed(42)
@@ -49,20 +48,15 @@ if 'initialized' not in st.session_state:
         cat = random.choice(categories)
         price = random.randint(1200, 3500) if is_target else random.randint(800, 4500)
         prod_year = year if year else random.randint(2018, 2024)
-        
-        # Consistent Design Logic for Heatmap clustering
-        if cat == "Diver":
-            diam, thick = random.choice([41.0, 42.0, 43.0]), random.choice([13.5, 14.5, 15.0])
-        elif cat == "Dress":
-            diam, thick = random.choice([37.0, 38.0, 39.0]), random.choice([8.5, 9.5, 10.5])
-        else:
-            diam, thick = random.choice([39.0, 40.0, 41.0]), random.choice([11.5, 12.5, 13.0])
-
         return {
             "Brand": brand, "Model": model, "Ref": ref, "Price": price,
-            "Category": cat, "Year": prod_year, "Diameter": diam, "Thickness": thick,
-            "WR": random.choice([50, 100, 200, 300]), "Reserve": random.choice([42, 70, 80]),
-            "Freq": random.choice([21600, 28800]), "Type": "Target" if is_target else "Market"
+            "Category": cat, "Year": prod_year, "Material": "Steel", 
+            "Diameter": random.choice([38.0, 39.0, 40.0, 41.0, 42.0]),
+            "Thickness": random.choice([10.5, 12.0, 13.5, 14.5]),
+            "WR": random.choice([50, 100, 200, 300]), 
+            "Reserve": random.choice([42, 70, 80]),
+            "Freq": random.choice([21600, 28800]), 
+            "Type": "Target" if is_target else "Market"
         }
 
     my_years = [2020, 2021, 2022, 2023, 2024]
@@ -72,17 +66,17 @@ if 'initialized' not in st.session_state:
     ]
     
     st.session_state.competitors = [
-        create_mock_watch(f"Brand {random.randint(1,25)}", f"Model {i}", f"REF-{1000+i}") 
-        for i in range(1, 501)
+        create_mock_watch(f"Brand {random.randint(1,20)}", f"Comp Model {i}", f"REF-{1000+i}") 
+        for i in range(1, 401)
     ]
     st.session_state.initialized = True
 
 # 4. SIDEBAR
 with st.sidebar:
     st.write("### Navigation")
-    view = st.radio("Sections", ["My Watches", "Pricing Intelligence", "Design Intelligence"])
+    view = st.radio("Sections", ["My Watches", "Pricing Intelligence"])
     st.write("---")
-    st.caption("Intelligence SaaS v2.5")
+    st.caption("Intelligence SaaS v2.3")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
@@ -97,62 +91,72 @@ if view == "My Watches":
                     <div style="font-size:0.8rem; color:#666;">Year: {watch['Year']}</div>
                 </div>
             """, unsafe_allow_html=True)
-            with st.expander("Specifications"):
-                st.write(f"Size: {watch['Diameter']}mm x {watch['Thickness']}mm")
-                st.write(f"Reserve: {watch['Reserve']}h")
+            with st.expander("Specs"):
+                st.write(f"**Ref:** {watch['Ref']}")
+                st.write(f"**Reserve:** {watch['Reserve']}h")
 
-# 6. VIEW: PRICING INTELLIGENCE (Restored)
+# 6. VIEW: PRICING INTELLIGENCE
 elif view == "Pricing Intelligence":
     units = {"Reserve": "h", "Thickness": "mm", "WR": "m", "Freq": "vph", "Diameter": "mm"}
+    
     col_f1, col_f2, col_f3 = st.columns([1.2, 1, 1.3])
     with col_f1:
-        target = st.selectbox("Select Target Watch", st.session_state.my_portfolio, 
-                             format_func=lambda x: f"{x['Model']} — {x['Category']} ({x['Year']})")
+        # AGGIORNATO: Visualizzazione Categoria e Anno nel menu a tendina
+        target = st.selectbox(
+            "Select Target Watch", 
+            st.session_state.my_portfolio, 
+            format_func=lambda x: f"{x['Model']} — {x['Category']} ({x['Year']})"
+        )
     with col_f2:
         y_param = st.selectbox("Technical Parameter", list(units.keys()))
     with col_f3:
         t_year = target['Year']
-        year_range = st.slider("Production Year Range", 2015, 2025, (t_year - 1, t_year + 1))
+        year_range = st.slider(
+            "Production Year Range",
+            min_value=2015, max_value=2025,
+            value=(t_year - 1, t_year + 1)
+        )
 
+    # FILTERING
     df_market = pd.DataFrame(st.session_state.competitors)
-    df_filtered = df_market[(df_market['Category'] == target['Category']) & 
-                            (df_market[y_param] == target[y_param]) &
-                            (df_market['Year'].between(year_range[0], year_range[1]))].copy()
+    df_filtered = df_market[
+        (df_market['Category'] == target['Category']) & 
+        (df_market[y_param] == target[y_param]) &
+        (df_market['Year'] >= year_range[0]) &
+        (df_market['Year'] <= year_range[1])
+    ].copy()
 
     if not df_filtered.empty:
         avg_p = df_filtered['Price'].mean()
         diff_pct = ((target['Price'] - avg_p) / avg_p) * 100
+        
         k1, k2, k3, k4, k5 = st.columns(5)
-        k1.metric("Category", target['Category']), k2.metric("Target Year", target['Year'])
-        k3.metric("Competitors", len(df_filtered)), k4.metric("Avg Price", f"€ {avg_p:,.0f}")
-        k5.metric("Your Price", f"€ {target['Price']:,}", f"{diff_pct:+.1f}% vs avg", delta_color="inverse")
+        k1.metric("Category", target['Category'])
+        k2.metric("Target Year", target['Year'])
+        k3.metric("Competitors", len(df_filtered))
+        k4.metric("Avg Market Price", f"€ {avg_p:,.0f}")
+        k5.metric(label="Your Price", value=f"€ {target['Price']:,}", 
+                  delta=f"{diff_pct:+.1f}% vs avg", delta_color="inverse")
         
         st.write("---")
+        
+        # Plot
         df_plot = pd.concat([df_filtered, pd.DataFrame([target])])
-        fig = px.scatter(df_plot, x="Price", y=y_param, color="Type",
-                         color_discrete_map={"Market": "#CBD5E0", "Target": "#D4AF37"},
-                         size=df_plot['Type'].apply(lambda x: 25 if x == "Target" else 15),
-                         labels={"Price": "Price (€)", y_param: f"{y_param} ({units[y_param]})"},
-                         template="plotly_white", height=480)
-        fig.update_layout(margin=dict(l=0, r=0, t=10, b=0), showlegend=False,
-                          xaxis=dict(ticksuffix=" €"), yaxis=dict(range=[target[y_param]*0.8, target[y_param]*1.2]))
+        fig = px.scatter(
+            df_plot, x="Price", y=y_param, color="Type",
+            color_discrete_map={"Market": "#CBD5E0", "Target": "#D4AF37"},
+            size=df_plot['Type'].apply(lambda x: 25 if x == "Target" else 15),
+            hover_name="Model",
+            hover_data={"Year": True, "Price": ":.0f", "Category": False, "Type": False},
+            labels={"Price": "Price (€)", y_param: f"{y_param} ({units[y_param]})"},
+            template="plotly_white", height=480
+        )
+        fig.update_layout(
+            margin=dict(l=0, r=0, t=10, b=0),
+            xaxis=dict(ticksuffix=" €", gridcolor="#f0f0f0"),
+            yaxis=dict(range=[target[y_param] * 0.8, target[y_param] * 1.2], ticksuffix=f" {units[y_param]}"),
+            showlegend=False
+        )
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.warning("No competitors found for this specific filter combination.")
-
-# 7. VIEW: DESIGN INTELLIGENCE
-elif view == "Design Intelligence":
-    st.subheader("White Space Heatmap")
-    df_comp = pd.DataFrame(st.session_state.competitors)
-    heatmap_data = pd.crosstab(df_comp['Thickness'], df_comp['Diameter'])
-    
-    colorscale = [[0, "#27ae60"], [0.1, "#f1c40f"], [0.5, "#e67e22"], [1.0, "#c0392b"]]
-    fig = go.Figure(data=go.Heatmap(z=heatmap_data.values, x=heatmap_data.columns, y=heatmap_data.index,
-                                    colorscale=colorscale, hovertemplate="Diam: %{x}mm<br>Thick: %{y}mm<br>Comp: %{z}<extra></extra>"))
-    fig.update_layout(xaxis_title="Case Diameter (mm)", yaxis_title="Case Thickness (mm)",
-                      height=550, template="plotly_white", margin=dict(l=0, r=0, t=20, b=0))
-    st.plotly_chart(fig, use_container_width=True)
-    
-    st.write("---")
-    c1, c2, c3 = st.columns(3)
-    c1.success("**White Space**: Design opportunity."), c2.warning("**Moderate**: Standard segment."), c3.error("**High**: Crowded market.")
+        st.warning(f"No competitors found in '{target['Category']}' with {target[y_param]} {units[y_param]} between {year_range[0]}-{year_range[1]}.")
