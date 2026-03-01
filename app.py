@@ -38,7 +38,7 @@ st.markdown("""
     </div>
     """, unsafe_allow_html=True)
 
-# 3. STATIC DATA GENERATION (With Production Year)
+# 3. STATIC DATA GENERATION
 if 'initialized' not in st.session_state:
     random.seed(42)
     np.random.seed(42)
@@ -59,7 +59,6 @@ if 'initialized' not in st.session_state:
             "Type": "Target" if is_target else "Market"
         }
 
-    # Fixed Years for My Watches
     my_years = [2020, 2021, 2022, 2023, 2024]
     st.session_state.my_portfolio = [
         create_mock_watch("MY BRAND", f"My watch {i}", f"REF-0{i}", True, my_years[i-1])
@@ -68,7 +67,7 @@ if 'initialized' not in st.session_state:
     
     st.session_state.competitors = [
         create_mock_watch(f"Brand {random.randint(1,20)}", f"Comp Model {i}", f"REF-{1000+i}") 
-        for i in range(1, 301) # Increased for better filtering
+        for i in range(1, 401)
     ]
     st.session_state.initialized = True
 
@@ -77,7 +76,7 @@ with st.sidebar:
     st.write("### Navigation")
     view = st.radio("Sections", ["My Watches", "Pricing Intelligence"])
     st.write("---")
-    st.caption("Intelligence SaaS v2.1")
+    st.caption("Intelligence SaaS v2.3")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
@@ -92,33 +91,33 @@ if view == "My Watches":
                     <div style="font-size:0.8rem; color:#666;">Year: {watch['Year']}</div>
                 </div>
             """, unsafe_allow_html=True)
-            with st.expander("Specifications"):
+            with st.expander("Specs"):
                 st.write(f"**Ref:** {watch['Ref']}")
-                st.write(f"**Power Reserve:** {watch['Reserve']}h")
+                st.write(f"**Reserve:** {watch['Reserve']}h")
 
 # 6. VIEW: PRICING INTELLIGENCE
 elif view == "Pricing Intelligence":
     units = {"Reserve": "h", "Thickness": "mm", "WR": "m", "Freq": "vph", "Diameter": "mm"}
     
-    col_f1, col_f2, col_f3 = st.columns([1, 1, 1.5])
-    
+    col_f1, col_f2, col_f3 = st.columns([1.2, 1, 1.3])
     with col_f1:
-        target = st.selectbox("Select Target Watch", st.session_state.my_portfolio, format_func=lambda x: x['Model'])
-    
+        # AGGIORNATO: Visualizzazione Categoria e Anno nel menu a tendina
+        target = st.selectbox(
+            "Select Target Watch", 
+            st.session_state.my_portfolio, 
+            format_func=lambda x: f"{x['Model']} — {x['Category']} ({x['Year']})"
+        )
     with col_f2:
         y_param = st.selectbox("Technical Parameter", list(units.keys()))
-    
     with col_f3:
-        # Year range slider centered on target year
         t_year = target['Year']
         year_range = st.slider(
             "Production Year Range",
             min_value=2015, max_value=2025,
-            value=(t_year - 1, t_year + 1),
-            help=f"Target watch year: {t_year}"
+            value=(t_year - 1, t_year + 1)
         )
 
-    # FILTERING LOGIC
+    # FILTERING
     df_market = pd.DataFrame(st.session_state.competitors)
     df_filtered = df_market[
         (df_market['Category'] == target['Category']) & 
@@ -131,12 +130,13 @@ elif view == "Pricing Intelligence":
         avg_p = df_filtered['Price'].mean()
         diff_pct = ((target['Price'] - avg_p) / avg_p) * 100
         
-        k1, k2, k3, k4 = st.columns(4)
-        k1.metric("Analysed Category", target['Category'])
-        k2.metric("Direct Competitors", len(df_filtered))
-        k3.metric("Market Average Price", f"€ {avg_p:,.0f}")
-        k4.metric(label="Your Price", value=f"€ {target['Price']:,}", 
-                  delta=f"{diff_pct:+.1f}% vs average", delta_color="inverse")
+        k1, k2, k3, k4, k5 = st.columns(5)
+        k1.metric("Category", target['Category'])
+        k2.metric("Target Year", target['Year'])
+        k3.metric("Competitors", len(df_filtered))
+        k4.metric("Avg Market Price", f"€ {avg_p:,.0f}")
+        k5.metric(label="Your Price", value=f"€ {target['Price']:,}", 
+                  delta=f"{diff_pct:+.1f}% vs avg", delta_color="inverse")
         
         st.write("---")
         
@@ -159,4 +159,4 @@ elif view == "Pricing Intelligence":
         )
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.warning(f"No competitors found for category '{target['Category']}' with {target[y_param]} {units[y_param]} in the year range {year_range[0]}-{year_range[1]}.")
+        st.warning(f"No competitors found in '{target['Category']}' with {target[y_param]} {units[y_param]} between {year_range[0]}-{year_range[1]}.")
