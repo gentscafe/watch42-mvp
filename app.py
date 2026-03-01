@@ -7,47 +7,20 @@ import random
 # 1. PAGE CONFIGURATION
 st.set_page_config(page_title="watch42 | Intelligence", layout="wide", initial_sidebar_state="expanded")
 
-# 2. UI STYLE (CSS Custom for Global Header and Space Reduction)
+# 2. UI STYLE
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-    
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-
-    /* Fixed Header */
     .global-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 60px;
-        background-color: white;
-        display: flex;
-        align-items: center;
-        padding: 0 20px;
-        border-bottom: 1px solid #eee;
-        z-index: 999999;
+        position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+        background-color: white; display: flex; align-items: center;
+        padding: 0 20px; border-bottom: 1px solid #eee; z-index: 999999;
     }
-    
-    .logo-text {
-        font-weight: 700;
-        font-size: 1.4rem;
-        color: #1a1a1a;
-        letter-spacing: -0.5px;
-    }
+    .logo-text { font-weight: 700; font-size: 1.4rem; color: #1a1a1a; letter-spacing: -0.5px; }
     .logo-accent { color: #d4af37; }
-
-    /* REDUCE STREAMLIT WHITE SPACES */
-    .block-container {
-        padding-top: 4rem !important; /* Aumentato lo spazio bianco in alto */
-        padding-bottom: 0rem !important;
-    }
-    
-    [data-testid="stHeader"] {
-        display: none;
-    }
-
-    /* Cards UI */
+    .block-container { padding-top: 4rem !important; padding-bottom: 0rem !important; }
+    [data-testid="stHeader"] { display: none; }
     .watch-tile {
         background-color: white; padding: 20px; border-radius: 10px;
         border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
@@ -60,24 +33,25 @@ st.markdown("""
         border-radius: 4px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
     }
     </style>
-    
     <div class="global-header">
         <div class="logo-text">watch<span class="logo-accent">42</span></div>
     </div>
     """, unsafe_allow_html=True)
 
-# 3. STATIC DATA GENERATION
+# 3. STATIC DATA GENERATION (With Production Year)
 if 'initialized' not in st.session_state:
     random.seed(42)
     np.random.seed(42)
     
-    def create_mock_watch(brand, model, ref, is_target=False):
+    def create_mock_watch(brand, model, ref, is_target=False, year=None):
         categories = ["Diver", "Dress", "GMT", "Chronograph", "Pilot/Field", "Casual"]
         cat = random.choice(categories)
         price = random.randint(1200, 3500) if is_target else random.randint(800, 4500)
+        prod_year = year if year else random.randint(2018, 2024)
         return {
             "Brand": brand, "Model": model, "Ref": ref, "Price": price,
-            "Category": cat, "Material": "Steel", "Diameter": random.choice([38.0, 39.0, 40.0, 41.0, 42.0]),
+            "Category": cat, "Year": prod_year, "Material": "Steel", 
+            "Diameter": random.choice([38.0, 39.0, 40.0, 41.0, 42.0]),
             "Thickness": random.choice([10.5, 12.0, 13.5, 14.5]),
             "WR": random.choice([50, 100, 200, 300]), 
             "Reserve": random.choice([42, 70, 80]),
@@ -85,14 +59,16 @@ if 'initialized' not in st.session_state:
             "Type": "Target" if is_target else "Market"
         }
 
+    # Fixed Years for My Watches
+    my_years = [2020, 2021, 2022, 2023, 2024]
     st.session_state.my_portfolio = [
-        create_mock_watch("MY BRAND", f"My watch {i}", f"REF-0{i}", True)
+        create_mock_watch("MY BRAND", f"My watch {i}", f"REF-0{i}", True, my_years[i-1])
         for i in range(1, 6)
     ]
     
     st.session_state.competitors = [
-        create_mock_watch(f"Brand {random.randint(1,20)}", f"Competitor Model {i}", f"REF-{1000+i}") 
-        for i in range(1, 251)
+        create_mock_watch(f"Brand {random.randint(1,20)}", f"Comp Model {i}", f"REF-{1000+i}") 
+        for i in range(1, 301) # Increased for better filtering
     ]
     st.session_state.initialized = True
 
@@ -101,11 +77,10 @@ with st.sidebar:
     st.write("### Navigation")
     view = st.radio("Sections", ["My Watches", "Pricing Intelligence"])
     st.write("---")
-    st.caption("Intelligence SaaS v2.0")
+    st.caption("Intelligence SaaS v2.1")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
-    # Titolo "My Brand Portfolio" rimosso
     cols = st.columns(5)
     for i, watch in enumerate(st.session_state.my_portfolio):
         with cols[i]:
@@ -114,63 +89,74 @@ if view == "My Watches":
                     <span class="category-badge">{watch['Category']}</span>
                     <div class="watch-title">{watch['Model']}</div>
                     <div class="watch-price">€ {watch['Price']:,}</div>
+                    <div style="font-size:0.8rem; color:#666;">Year: {watch['Year']}</div>
                 </div>
             """, unsafe_allow_html=True)
             with st.expander("Specifications"):
                 st.write(f"**Ref:** {watch['Ref']}")
                 st.write(f"**Power Reserve:** {watch['Reserve']}h")
-                st.write(f"**Frequency:** {watch['Freq']}vph")
 
 # 6. VIEW: PRICING INTELLIGENCE
 elif view == "Pricing Intelligence":
-    
     units = {"Reserve": "h", "Thickness": "mm", "WR": "m", "Freq": "vph", "Diameter": "mm"}
     
-    col_f1, col_f2 = st.columns(2)
+    col_f1, col_f2, col_f3 = st.columns([1, 1, 1.5])
+    
     with col_f1:
         target = st.selectbox("Select Target Watch", st.session_state.my_portfolio, format_func=lambda x: x['Model'])
+    
     with col_f2:
         y_param = st.selectbox("Technical Parameter", list(units.keys()))
-
-    target_cat = target['Category']
-    target_value = target[y_param]
-    unit_y = units[y_param]
-    df_market = pd.DataFrame(st.session_state.competitors)
     
+    with col_f3:
+        # Year range slider centered on target year
+        t_year = target['Year']
+        year_range = st.slider(
+            "Production Year Range",
+            min_value=2015, max_value=2025,
+            value=(t_year - 1, t_year + 1),
+            help=f"Target watch year: {t_year}"
+        )
+
+    # FILTERING LOGIC
+    df_market = pd.DataFrame(st.session_state.competitors)
     df_filtered = df_market[
-        (df_market['Category'] == target_cat) & 
-        (df_market[y_param] == target_value)
+        (df_market['Category'] == target['Category']) & 
+        (df_market[y_param] == target[y_param]) &
+        (df_market['Year'] >= year_range[0]) &
+        (df_market['Year'] <= year_range[1])
     ].copy()
 
     if not df_filtered.empty:
         avg_p = df_filtered['Price'].mean()
         diff_pct = ((target['Price'] - avg_p) / avg_p) * 100
         
-        # KPI Section
         k1, k2, k3, k4 = st.columns(4)
-        k1.metric("Analysed Category", target_cat)
+        k1.metric("Analysed Category", target['Category'])
         k2.metric("Direct Competitors", len(df_filtered))
         k3.metric("Market Average Price", f"€ {avg_p:,.0f}")
         k4.metric(label="Your Price", value=f"€ {target['Price']:,}", 
                   delta=f"{diff_pct:+.1f}% vs average", delta_color="inverse")
         
         st.write("---")
-
+        
+        # Plot
         df_plot = pd.concat([df_filtered, pd.DataFrame([target])])
         fig = px.scatter(
             df_plot, x="Price", y=y_param, color="Type",
             color_discrete_map={"Market": "#CBD5E0", "Target": "#D4AF37"},
             size=df_plot['Type'].apply(lambda x: 25 if x == "Target" else 15),
             hover_name="Model",
-            labels={"Price": "Price (€)", y_param: f"{y_param} ({unit_y})"},
-            template="plotly_white", height=500
+            hover_data={"Year": True, "Price": ":.0f", "Category": False, "Type": False},
+            labels={"Price": "Price (€)", y_param: f"{y_param} ({units[y_param]})"},
+            template="plotly_white", height=480
         )
         fig.update_layout(
-            margin=dict(l=0, r=0, t=20, b=0),
+            margin=dict(l=0, r=0, t=10, b=0),
             xaxis=dict(ticksuffix=" €", gridcolor="#f0f0f0"),
-            yaxis=dict(range=[target_value * 0.8, target_value * 1.2], ticksuffix=f" {unit_y}"),
+            yaxis=dict(range=[target[y_param] * 0.8, target[y_param] * 1.2], ticksuffix=f" {units[y_param]}"),
             showlegend=False
         )
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.warning(f"No competitors found in the '{target_cat}' category with {target_value} {unit_y} {y_param}.")
+        st.warning(f"No competitors found for category '{target['Category']}' with {target[y_param]} {units[y_param]} in the year range {year_range[0]}-{year_range[1]}.")
