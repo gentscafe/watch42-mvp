@@ -5,56 +5,63 @@ import numpy as np
 import random
 
 # 1. CONFIGURAZIONE PAGINA
-st.set_page_config(page_title="watch42 | Intelligence", layout="wide")
+st.set_page_config(page_title="watch42 | Intelligence", layout="wide", initial_sidebar_state="expanded")
 
-# 2. STILE UI (Executive White con Header)
+# 2. STILE UI (CSS Custom per Header Globale)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-    
-    /* Header Styling */
-    .main-header {
+
+    /* Header Fisso in alto a tutto */
+    .global-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 60px;
         background-color: white;
-        padding: 1rem 2rem;
-        border-bottom: 1px solid #eee;
         display: flex;
         align-items: center;
-        margin-bottom: 2rem;
+        padding: 0 20px;
+        border-bottom: 1px solid #eee;
+        z-index: 999999; /* Sopra la sidebar */
     }
+    
     .logo-text {
-        font-family: 'Inter', sans-serif;
         font-weight: 700;
-        font-size: 1.5rem;
+        font-size: 1.4rem;
         color: #1a1a1a;
         letter-spacing: -0.5px;
     }
     .logo-accent { color: #d4af37; }
 
-    /* Cards & Badges */
+    /* Padding per non far finire il contenuto sotto l'header */
+    .stApp {
+        margin-top: 40px;
+    }
+
+    /* Cards & UI Elements */
     .watch-tile {
         background-color: white; padding: 20px; border-radius: 10px;
         border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        margin-bottom: 10px;
+        margin-bottom: 10px; min-height: 180px;
     }
-    .watch-title { font-size: 1.1rem; font-weight: 600; color: #111; }
-    .watch-price { font-size: 1.2rem; font-weight: 500; color: #d4af37; margin-top: 8px; }
+    .watch-title { font-size: 1.05rem; font-weight: 600; color: #111; margin-top: 10px; }
+    .watch-price { font-size: 1.15rem; font-weight: 500; color: #d4af37; margin-top: 5px; }
     .category-badge { 
         background-color: #f3f4f6; color: #374151; padding: 2px 8px; 
-        border-radius: 4px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase;
+        border-radius: 4px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
     }
     </style>
-    """, unsafe_allow_html=True)
-
-# 3. HEADER SUPERIORE
-st.markdown("""
-    <div class="main-header">
+    
+    <div class="global-header">
         <div class="logo-text">watch<span class="logo-accent">42</span></div>
     </div>
     """, unsafe_allow_html=True)
 
-# 4. GENERAZIONE DATI STATICI (Seed fisso 42)
+# 3. GENERAZIONE DATI STATICI (Seed 42)
 if 'initialized' not in st.session_state:
     random.seed(42)
     np.random.seed(42)
@@ -74,7 +81,7 @@ if 'initialized' not in st.session_state:
         }
 
     st.session_state.my_portfolio = [
-        create_mock_watch("MY BRAND", f"My watch {i}", f"MB-0{i}", True)
+        create_mock_watch("MY BRAND", f"My watch {i}", f"REF-0{i}", True)
         for i in range(1, 6)
     ]
     
@@ -84,14 +91,14 @@ if 'initialized' not in st.session_state:
     ]
     st.session_state.initialized = True
 
-# 5. SIDEBAR
+# 4. SIDEBAR (Ora parte sotto l'header)
 with st.sidebar:
     st.write("### Navigazione")
     view = st.radio("Sezioni", ["My Watches", "Pricing Intelligence"])
     st.write("---")
-    st.caption("Intelligence SaaS v1.7")
+    st.caption("Intelligence SaaS v1.8")
 
-# 6. VIEW: MY WATCHES
+# 5. VIEW: MY WATCHES
 if view == "My Watches":
     st.header("My Brand Portfolio")
     cols = st.columns(5)
@@ -100,16 +107,16 @@ if view == "My Watches":
             st.markdown(f"""
                 <div class="watch-tile">
                     <span class="category-badge">{watch['Category']}</span>
-                    <div class="watch-title" style="margin-top:8px;">{watch['Model']}</div>
+                    <div class="watch-title">{watch['Model']}</div>
                     <div class="watch-price">€ {watch['Price']:,}</div>
                 </div>
             """, unsafe_allow_html=True)
-            with st.expander("Dettagli"):
-                st.write(f"Ref: {watch['Ref']}")
-                st.write(f"Riserva: {watch['Reserve']}h")
-                st.write(f"Cassa: {watch['Diameter']}mm")
+            with st.expander("Specifiche"):
+                st.write(f"**Ref:** {watch['Ref']}")
+                st.write(f"**Riserva:** {watch['Reserve']}h")
+                st.write(f"**WR:** {watch['WR']}m")
 
-# 7. VIEW: PRICING INTELLIGENCE
+# 6. VIEW: PRICING INTELLIGENCE
 elif view == "Pricing Intelligence":
     st.header("Dynamic Pricing Matrix")
     
