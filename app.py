@@ -39,7 +39,7 @@ st.markdown("""
     </div>
     """, unsafe_allow_html=True)
 
-# 3. STATIC DATA GENERATION (Unified)
+# 3. STATIC DATA GENERATION
 if 'initialized' not in st.session_state:
     random.seed(42)
     np.random.seed(42)
@@ -50,6 +50,7 @@ if 'initialized' not in st.session_state:
         price = random.randint(1200, 3500) if is_target else random.randint(800, 4500)
         prod_year = year if year else random.randint(2018, 2024)
         
+        # Dimensioni coerenti per categoria
         if cat == "Diver":
             diam, thick = random.choice([41.0, 42.0, 43.0]), random.uniform(13.0, 15.5)
         elif cat == "Dress":
@@ -65,13 +66,12 @@ if 'initialized' not in st.session_state:
         }
 
     st.session_state.my_portfolio = [
-        create_mock_watch("MY BRAND", f"My watch {i}", f"REF-0{i}", True, 2020+i)
+        create_mock_watch("MY BRAND", f"My watch {i}", f"REF-0{i}", True, 2019+i)
         for i in range(1, 6)
     ]
-    
     st.session_state.competitors = [
         create_mock_watch(f"Brand {random.randint(1,25)}", f"Model {i}", f"REF-{1000+i}") 
-        for i in range(1, 801) # Increased population to show multiple competitors
+        for i in range(1, 801)
     ]
     st.session_state.initialized = True
 
@@ -80,7 +80,7 @@ with st.sidebar:
     st.write("### Navigation")
     view = st.radio("Sections", ["My Watches", "Pricing Intelligence", "Design Intelligence"])
     st.write("---")
-    st.caption("Intelligence SaaS v2.7")
+    st.caption("Intelligence SaaS v2.8")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
@@ -98,7 +98,7 @@ if view == "My Watches":
             with st.expander("Specifications"):
                 st.write(f"Size: {watch['Diameter']}mm x {watch['Thickness']}mm")
 
-# 6. VIEW: PRICING INTELLIGENCE (Multi-Competitor List)
+# 6. VIEW: PRICING INTELLIGENCE
 elif view == "Pricing Intelligence":
     units = {"Reserve": "h", "Thickness": "mm", "WR": "m", "Freq": "vph", "Diameter": "mm"}
     col_f1, col_f2, col_f3 = st.columns([1.2, 1, 1.3])
@@ -119,9 +119,13 @@ elif view == "Pricing Intelligence":
     if not df_filtered.empty:
         avg_p = df_filtered['Price'].mean()
         diff_pct = ((target['Price'] - avg_p) / avg_p) * 100
+        
+        # KPI - CORREZIONE SINTASSI
         k1, k2, k3, k4, k5 = st.columns(5)
-        k1.metric("Category", target['Category']), k2.metric("Target Year", target['Year'])
-        k3.metric("Competitors", len(df_filtered)), k4.metric("Avg Price", f"€ {avg_p:,.0f}")
+        k1.metric("Category", target['Category'])
+        k2.metric("Target Year", target['Year'])
+        k3.metric("Competitors", len(df_filtered))
+        k4.metric("Avg Price", f"€ {avg_p:,.0f}")
         k5.metric("Your Price", f"€ {target['Price']:,}", f"{diff_pct:+.1f}% vs avg", delta_color="inverse")
         
         st.write("---")
@@ -134,13 +138,12 @@ elif view == "Pricing Intelligence":
         fig.update_layout(margin=dict(l=0, r=0, t=10, b=0), showlegend=False)
         st.plotly_chart(fig, use_container_width=True)
         
-        # New: List of all matched competitors
         st.write("### Detailed Competitor List")
         st.dataframe(df_filtered[["Brand", "Model", "Price", "Year", y_param]].sort_values("Price"), use_container_width=True)
     else:
         st.warning("No competitors found for this selection.")
 
-# 7. VIEW: DESIGN INTELLIGENCE (Enhanced Scatter Overlay)
+# 7. VIEW: DESIGN INTELLIGENCE
 elif view == "Design Intelligence":
     col_h1, col_h2 = st.columns([2, 1])
     with col_h1:
@@ -151,7 +154,6 @@ elif view == "Design Intelligence":
     df_all = pd.DataFrame(st.session_state.competitors)
     df_filtered_design = df_all[df_all['Year'].between(design_year_range[0], design_year_range[1])].copy()
     
-    # Heatmap Density
     heatmap_df = df_filtered_design.groupby(['Diameter', 'Thickness']).size().reset_index(name='count')
     pivot_table = heatmap_df.pivot(index='Thickness', columns='Diameter', values='count').fillna(0)
 
@@ -163,13 +165,13 @@ elif view == "Design Intelligence":
         hovertemplate="Diam: %{x}mm<br>Thick: %{y}mm<br>Density: %{z}<extra></extra>"
     ))
 
-    # Scatter Overlay with Jitter to show multiple competitors in same spot
+    # Scatter con jitter per mostrare tutti i competitor
     fig.add_trace(go.Scatter(
-        x=df_filtered_design['Diameter'] + np.random.uniform(-0.05, 0.05, len(df_filtered_design)), 
-        y=df_filtered_design['Thickness'] + np.random.uniform(-0.05, 0.05, len(df_filtered_design)),
+        x=df_filtered_design['Diameter'] + np.random.uniform(-0.06, 0.06, len(df_filtered_design)), 
+        y=df_filtered_design['Thickness'] + np.random.uniform(-0.06, 0.06, len(df_filtered_design)),
         mode='markers', marker=dict(color='white', size=5, line=dict(width=0.5, color='black')),
         name='Competitors', hoverinfo='text',
-        text=[f"<b>{row['Brand']}</b><br>{row['Model']}<br>{row['Year']}<br>{row['Diameter']}x{row['Thickness']}mm" for _, row in df_filtered_design.iterrows()]
+        text=[f"<b>{row['Brand']}</b><br>{row['Model']}<br>{row['Year']}" for _, row in df_filtered_design.iterrows()]
     ))
 
     fig.update_layout(xaxis_title="Case Diameter (mm)", yaxis_title="Case Thickness (mm)",
