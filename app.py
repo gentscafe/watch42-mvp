@@ -30,14 +30,14 @@ st.markdown("""
     }
     .stButton > button:hover { background-color: #F8FAFC !important; color: #1E293B !important; }
     .atlass-card {
-        background-color: white; padding: 20px; border-radius: 16px; border: 1px solid #E2E8F0;
+        background-color: white; padding: 24px; border-radius: 16px; border: 1px solid #E2E8F0;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); margin-bottom: 20px;
     }
     .category-badge { 
         background-color: #F1F5F9; color: #475569; padding: 4px 10px; 
         border-radius: 6px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
     }
-    .price-tag { color: #d4af37; font-weight: 600; font-size: 1.05rem; }
+    .price-tag { color: #d4af37; font-weight: 600; font-size: 1.1rem; }
     .block-container { padding-top: 6rem !important; padding-right: 3rem !important; padding-left: 3rem !important; }
     [data-testid="stHeader"] { display: none; }
     .insight-box { background-color: #FEF9C3; border-left: 4px solid #d4af37; padding: 16px; border-radius: 8px; margin-top: 10px; }
@@ -47,26 +47,26 @@ st.markdown("""
 
 # 3. DATA ENGINE - FEARS PORTFOLIO + MARKET DATA
 fears_models = [
-    {"Model": "Brunswick 38 Copper", "Category": "Casual", "Year": 2022, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 4150, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 40 Silver", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Archival 1930 Small Seconds", "Category": "Dress", "Year": 2021, "Diameter": 22, "Thickness": 8.5, "Reserve": 40, "Price": 4200, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 38 Blue Danubian", "Category": "Casual", "Year": 2023, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 4150, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick PT (Platinum)", "Category": "Luxury", "Year": 2023, "Diameter": 38, "Thickness": 12.1, "Reserve": 50, "Price": 33000, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Fears Garrick Collaboration", "Category": "High-End", "Year": 2022, "Diameter": 42, "Thickness": 10.0, "Reserve": 45, "Price": 19500, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 40 Pinkish Salmon", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 38 White Rose", "Category": "Casual", "Year": 2022, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 4150, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Archival 1930 Topper Edition", "Category": "Dress", "Year": 2022, "Diameter": 22, "Thickness": 8.5, "Reserve": 40, "Price": 4500, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 40 Aurora", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4600, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 38 Champagne", "Category": "Casual", "Year": 2021, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 3950, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 40 Mallard Green", "Category": "Casual", "Year": 2023, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 38 Midas Gold", "Category": "Luxury", "Year": 2023, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 15500, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 38 Jubilee Edition", "Category": "Casual", "Year": 2022, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 4300, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Archival 1930 Boutique", "Category": "Dress", "Year": 2023, "Diameter": 22, "Thickness": 8.5, "Reserve": 40, "Price": 4200, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 40 Blue", "Category": "Casual", "Year": 2023, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 38 Salmon", "Category": "Casual", "Year": 2020, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 3850, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 40 Black", "Category": "Casual", "Year": 2023, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 38 Silver", "Category": "Casual", "Year": 2021, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 3950, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"},
-    {"Model": "Brunswick 40 Topper Edition", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4700, "Img": "https://images.unsplash.com/photo-1614164185128-e4ec99c436d7?q=80&w=300&auto=format&fit=crop"}
+    {"Model": "Brunswick 38 Copper", "Category": "Casual", "Year": 2022, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 4150},
+    {"Model": "Brunswick 40 Silver", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450},
+    {"Model": "Archival 1930 Small Seconds", "Category": "Dress", "Year": 2021, "Diameter": 22, "Thickness": 8.5, "Reserve": 40, "Price": 4200},
+    {"Model": "Brunswick 38 Blue Danubian", "Category": "Casual", "Year": 2023, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 4150},
+    {"Model": "Brunswick PT (Platinum)", "Category": "Luxury", "Year": 2023, "Diameter": 38, "Thickness": 12.1, "Reserve": 50, "Price": 33000},
+    {"Model": "Fears Garrick Collaboration", "Category": "High-End", "Year": 2022, "Diameter": 42, "Thickness": 10.0, "Reserve": 45, "Price": 19500},
+    {"Model": "Brunswick 40 Pinkish Salmon", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450},
+    {"Model": "Brunswick 38 White Rose", "Category": "Casual", "Year": 2022, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 4150},
+    {"Model": "Archival 1930 Topper Edition", "Category": "Dress", "Year": 2022, "Diameter": 22, "Thickness": 8.5, "Reserve": 40, "Price": 4500},
+    {"Model": "Brunswick 40 Aurora", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4600},
+    {"Model": "Brunswick 38 Champagne", "Category": "Casual", "Year": 2021, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 3950},
+    {"Model": "Brunswick 40 Mallard Green", "Category": "Casual", "Year": 2023, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450},
+    {"Model": "Brunswick 38 Midas Gold", "Category": "Luxury", "Year": 2023, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 15500},
+    {"Model": "Brunswick 38 Jubilee Edition", "Category": "Casual", "Year": 2022, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 4300},
+    {"Model": "Archival 1930 Boutique", "Category": "Dress", "Year": 2023, "Diameter": 22, "Thickness": 8.5, "Reserve": 40, "Price": 4200},
+    {"Model": "Brunswick 40 Blue", "Category": "Casual", "Year": 2023, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450},
+    {"Model": "Brunswick 38 Salmon", "Category": "Casual", "Year": 2020, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 3850},
+    {"Model": "Brunswick 40 Black", "Category": "Casual", "Year": 2023, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450},
+    {"Model": "Brunswick 38 Silver", "Category": "Casual", "Year": 2021, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 3950},
+    {"Model": "Brunswick 40 Topper Edition", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4700}
 ]
 
 st.session_state.my_portfolio = fears_models
@@ -80,8 +80,7 @@ if 'competitors' not in st.session_state:
             "Brand": f"Brand {random.randint(1,50)}", "Model": f"M-{i}", 
             "Category": random.choice(["Casual", "Dress", "Luxury", "High-End"]), 
             "Year": yr, "Diameter": random.choice([38, 39, 40, 41, 42]), "Thickness": random.uniform(9, 14), 
-            "Reserve": int(42 + (yr-2019)*5), "Price": random.randint(3000, 25000),
-            "Material": random.choices(["Steel", "Titanium Grade 5"], weights=[0.8, 0.2])[0]
+            "Reserve": int(42 + (yr-2019)*5), "Price": random.randint(3000, 25000)
         })
 
 # 4. CUSTOM SIDEBAR NAVIGATION
@@ -93,32 +92,27 @@ with st.sidebar:
     for n, icon in pages:
         st.button(f"{icon} {n}", key=f"btn_{n}", use_container_width=True, on_click=set_v, args=(n,))
     st.write("---")
-    st.caption("Fears Analytics v6.2")
+    st.caption("Fears Analytics v6.3")
 
 view = st.session_state.p_view
 df_all = pd.DataFrame(st.session_state.competitors)
 
-# --- 5. VIEW: DASHBOARD (Fears Catalog con Immagini) ---
+# --- 5. VIEW: DASHBOARD (Fears Catalog - No Images) ---
 if view == "Dashboard":
-    st.markdown("### Fears Visual Collection")
+    st.markdown("### Fears Collection Overview")
     cols = st.columns(4)
     for i, w in enumerate(st.session_state.my_portfolio):
         with cols[i % 4]:
             st.markdown(f"""
-                <div class="atlass-card" style="padding:0; overflow:hidden;">
-                    <div style="width:100%; height:150px; background-color:#fcfcfc; display:flex; align-items:center; justify-content:center; border-bottom:1px solid #F1F5F9;">
-                        <img src="{w['Img']}" style="max-height:130px; opacity:0.8;">
-                    </div>
-                    <div style="padding:15px;">
-                        <span class="category-badge">{w['Category']}</span>
-                        <div style="font-weight:600; margin-top:8px; color:#1E293B; height:38px; overflow:hidden; font-size:0.9rem;">{w['Model']}</div>
-                        <div class="price-tag">€ {w['Price']:,}</div>
-                        <div style="font-size:0.7rem; color:#94A3B8; margin-top:5px; border-top:1px solid #F1F5F9; padding-top:5px;">{w['Diameter']}mm | {w['Year']} Edition</div>
-                    </div>
+                <div class="atlass-card">
+                    <span class="category-badge">{w['Category']}</span>
+                    <div style="font-weight:600; margin-top:12px; color:#1E293B; height:38px; overflow:hidden; font-size:0.95rem;">{w['Model']}</div>
+                    <div class="price-tag">€ {w['Price']:,}</div>
+                    <div style="font-size:0.75rem; color:#94A3B8; margin-top:8px; border-top:1px solid #F1F5F9; padding-top:8px;">{w['Diameter']}mm | {w['Year']} Edition</div>
                 </div>
             """, unsafe_allow_html=True)
 
-# --- 6. VIEW: PRICING INTELLIGENCE (Ripristinato) ---
+# --- 6. VIEW: PRICING INTELLIGENCE ---
 elif view == "Pricing Intelligence":
     col_t1, col_t2 = st.columns([2, 1])
     with col_t1: st.markdown("### Pricing Analysis")
@@ -141,7 +135,7 @@ elif view == "Pricing Intelligence":
     st.plotly_chart(fig_p, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
-# --- 7. VIEW: DESIGN GRID (Ripristinato) ---
+# --- 7. VIEW: DESIGN GRID ---
 elif view == "Design Grid":
     st.markdown("### Design Intelligence Matrix")
     c1, c2 = st.columns([1, 2])
@@ -164,7 +158,7 @@ elif view == "Design Grid":
     with col_m2:
         st.markdown(f'<div class="atlass-card" style="height:495px;"><div class="card-label">Strategic Insights</div><div class="card-value">{len(df_f_design)} Models</div><hr style="border:0; border-top:1px solid #E2E8F0; margin:20px 0;"><div style="font-size:0.9rem; color:#475569;"><b>White Space Detected:</b><br>Low competition in dimensions below 39mm for the {sel_cat} segment.</div></div>', unsafe_allow_html=True)
 
-# --- 8. VIEW: MARKET TRENDS (Ripristinato) ---
+# --- 8. VIEW: MARKET TRENDS ---
 elif view == "Market Trends":
     st.markdown("### Market Intelligence & Trends")
     trend_cat = st.selectbox("Segment Filter", ["All Categories"] + list(df_all['Category'].unique()))
