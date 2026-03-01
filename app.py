@@ -7,40 +7,42 @@ import random
 # 1. CONFIGURAZIONE PAGINA
 st.set_page_config(page_title="watch42 | Intelligence", layout="wide", initial_sidebar_state="expanded")
 
-# 2. STILE UI (CSS Custom per Header Globale e Riduzione Spazi)
+# 2. STILE UI (CSS Rifinito con più respiro)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-    /* Header Fisso */
+    /* Header Fisso con più padding */
     .global-header {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        height: 60px;
+        height: 70px; /* Leggermente più alto */
         background-color: white;
         display: flex;
         align-items: center;
-        padding: 0 20px;
+        padding: 0 40px; /* Più spazio ai lati */
         border-bottom: 1px solid #eee;
         z-index: 999999;
     }
     
     .logo-text {
         font-weight: 700;
-        font-size: 1.4rem;
+        font-size: 1.6rem;
         color: #1a1a1a;
         letter-spacing: -0.5px;
     }
     .logo-accent { color: #d4af37; }
 
-    /* RIMOZIONE SPAZI BIANCHI STREAMLIT */
+    /* DISTANZIAMENTO CONTENUTO */
     .block-container {
-        padding-top: 2rem !important;
-        padding-bottom: 0rem !important;
+        padding-top: 5rem !important; /* Più spazio tra header e contenuto */
+        padding-bottom: 2rem !important;
+        padding-left: 3rem !important;
+        padding-right: 3rem !important;
     }
     
     [data-testid="stHeader"] {
@@ -49,15 +51,15 @@ st.markdown("""
 
     /* Cards UI */
     .watch-tile {
-        background-color: white; padding: 20px; border-radius: 10px;
-        border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
-        margin-bottom: 10px; min-height: 180px;
+        background-color: white; padding: 25px; border-radius: 12px;
+        border: 1px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        margin-bottom: 15px; min-height: 200px;
     }
-    .watch-title { font-size: 1.05rem; font-weight: 600; color: #111; margin-top: 10px; }
-    .watch-price { font-size: 1.15rem; font-weight: 500; color: #d4af37; margin-top: 5px; }
+    .watch-title { font-size: 1.1rem; font-weight: 600; color: #111; margin-top: 12px; }
+    .watch-price { font-size: 1.2rem; font-weight: 500; color: #d4af37; margin-top: 6px; }
     .category-badge { 
-        background-color: #f3f4f6; color: #374151; padding: 2px 8px; 
-        border-radius: 4px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
+        background-color: #f3f4f6; color: #374151; padding: 4px 10px; 
+        border-radius: 5px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
     }
     </style>
     
@@ -98,10 +100,11 @@ if 'initialized' not in st.session_state:
 
 # 4. SIDEBAR
 with st.sidebar:
+    st.markdown("<br><br>", unsafe_allow_html=True) # Spazio per non finire sotto l'header
     st.write("### Navigazione")
     view = st.radio("Sezioni", ["My Watches", "Pricing Intelligence"])
     st.write("---")
-    st.caption("Intelligence SaaS v1.9")
+    st.caption("watch42 Intelligence v1.9.1")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
@@ -120,11 +123,12 @@ if view == "My Watches":
                 st.write(f"**Ref:** {watch['Ref']}")
                 st.write(f"**Riserva:** {watch['Reserve']}h")
 
-# 6. VIEW: PRICING INTELLIGENCE (Compact Mode)
+# 6. VIEW: PRICING INTELLIGENCE
 elif view == "Pricing Intelligence":
-    # Rimosso il titolo h1 per guadagnare spazio
-    
     units = {"Reserve": "h", "Thickness": "mm", "WR": "m", "Freq": "vph", "Diameter": "mm"}
+    
+    # Spazio extra sopra i filtri
+    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
     
     col_f1, col_f2 = st.columns(2)
     with col_f1:
@@ -146,7 +150,8 @@ elif view == "Pricing Intelligence":
         avg_p = df_filtered['Price'].mean()
         diff_pct = ((target['Price'] - avg_p) / avg_p) * 100
         
-        # KPI Section
+        st.markdown("<br>", unsafe_allow_html=True)
+        
         k1, k2, k3, k4 = st.columns(4)
         k1.metric("Categoria", target_cat)
         k2.metric("Competitor", len(df_filtered))
@@ -166,7 +171,7 @@ elif view == "Pricing Intelligence":
             template="plotly_white", height=500
         )
         fig.update_layout(
-            margin=dict(l=0, r=0, t=20, b=0), # Ridotto margine del grafico
+            margin=dict(l=0, r=0, t=30, b=0),
             xaxis=dict(ticksuffix=" €", gridcolor="#f0f0f0"),
             yaxis=dict(range=[target_value * 0.8, target_value * 1.2], ticksuffix=f" {unit_y}"),
             showlegend=False
