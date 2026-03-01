@@ -5,14 +5,34 @@ import numpy as np
 import random
 
 # 1. CONFIGURAZIONE PAGINA
-st.set_page_config(page_title="HoroIntel | Competitive Intelligence", layout="wide")
+st.set_page_config(page_title="watch42 | Intelligence", layout="wide")
 
-# 2. STILE UI (Executive White)
+# 2. STILE UI (Executive White con Header)
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
-    .main { background-color: #fcfcfc; }
+    
+    /* Header Styling */
+    .main-header {
+        background-color: white;
+        padding: 1rem 2rem;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+    .logo-text {
+        font-family: 'Inter', sans-serif;
+        font-weight: 700;
+        font-size: 1.5rem;
+        color: #1a1a1a;
+        letter-spacing: -0.5px;
+    }
+    .logo-accent { color: #d4af37; }
+
+    /* Cards & Badges */
     .watch-tile {
         background-color: white; padding: 20px; border-radius: 10px;
         border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
@@ -27,7 +47,14 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. GENERAZIONE DATI STATICI
+# 3. HEADER SUPERIORE
+st.markdown("""
+    <div class="main-header">
+        <div class="logo-text">watch<span class="logo-accent">42</span></div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# 4. GENERAZIONE DATI STATICI (Seed fisso 42)
 if 'initialized' not in st.session_state:
     random.seed(42)
     np.random.seed(42)
@@ -46,7 +73,6 @@ if 'initialized' not in st.session_state:
             "Type": "Target" if is_target else "Market"
         }
 
-    # Creazione dei 5 modelli "MY BRAND"
     st.session_state.my_portfolio = [
         create_mock_watch("MY BRAND", f"My watch {i}", f"MB-0{i}", True)
         for i in range(1, 6)
@@ -58,15 +84,14 @@ if 'initialized' not in st.session_state:
     ]
     st.session_state.initialized = True
 
-# 4. SIDEBAR
+# 5. SIDEBAR
 with st.sidebar:
-    st.title("HORO INTEL")
+    st.write("### Navigazione")
+    view = st.radio("Sezioni", ["My Watches", "Pricing Intelligence"])
     st.write("---")
-    view = st.radio("Sezione", ["My Watches", "Pricing Intelligence"])
-    st.write("---")
-    st.caption("v1.6 - KPI context enhanced")
+    st.caption("Intelligence SaaS v1.7")
 
-# 5. VIEW: MY WATCHES
+# 6. VIEW: MY WATCHES
 if view == "My Watches":
     st.header("My Brand Portfolio")
     cols = st.columns(5)
@@ -79,26 +104,23 @@ if view == "My Watches":
                     <div class="watch-price">€ {watch['Price']:,}</div>
                 </div>
             """, unsafe_allow_html=True)
-            with st.expander("Dettagli Tecnici"):
+            with st.expander("Dettagli"):
                 st.write(f"Ref: {watch['Ref']}")
                 st.write(f"Riserva: {watch['Reserve']}h")
-                st.write(f"Frequenza: {watch['Freq']}vph")
+                st.write(f"Cassa: {watch['Diameter']}mm")
 
-# 6. VIEW: PRICING INTELLIGENCE
+# 7. VIEW: PRICING INTELLIGENCE
 elif view == "Pricing Intelligence":
     st.header("Dynamic Pricing Matrix")
     
     units = {"Reserve": "h", "Thickness": "mm", "WR": "m", "Freq": "vph", "Diameter": "mm"}
     
-    col_filter1, col_filter2 = st.columns(2)
-    with col_filter1:
-        target = st.selectbox("Seleziona Target (MY BRAND)", 
-                             st.session_state.my_portfolio, 
-                             format_func=lambda x: f"{x['Model']}")
-    with col_filter2:
+    col_f1, col_f2 = st.columns(2)
+    with col_f1:
+        target = st.selectbox("Seleziona Target", st.session_state.my_portfolio, format_func=lambda x: x['Model'])
+    with col_f2:
         y_param = st.selectbox("Parametro Tecnico", list(units.keys()))
 
-    # Logica di Filtro automatica per categoria del target
     target_cat = target['Category']
     target_value = target[y_param]
     unit_y = units[y_param]
@@ -114,22 +136,15 @@ elif view == "Pricing Intelligence":
         avg_p = df_filtered['Price'].mean()
         diff_pct = ((target['Price'] - avg_p) / avg_p) * 100
         
-        # --- SEZIONE KPI A 4 COLONNE ---
         k1, k2, k3, k4 = st.columns(4)
-        
-        k1.metric("Categoria Analizzata", target_cat)
-        k2.metric("Competitor Diretti", len(df_filtered))
-        k3.metric("Prezzo Medio Mercato", f"€ {avg_p:,.0f}")
-        k4.metric(
-            label="Il Tuo Prezzo", 
-            value=f"€ {target['Price']:,}", 
-            delta=f"{diff_pct:+.1f}% vs media",
-            delta_color="inverse"
-        )
+        k1.metric("Categoria", target_cat)
+        k2.metric("Competitor", len(df_filtered))
+        k3.metric("Media Mercato", f"€ {avg_p:,.0f}")
+        k4.metric(label="Il Tuo Prezzo", value=f"€ {target['Price']:,}", 
+                  delta=f"{diff_pct:+.1f}% vs media", delta_color="inverse")
         
         st.write("---")
 
-        # --- GRAFICO ---
         df_plot = pd.concat([df_filtered, pd.DataFrame([target])])
         fig = px.scatter(
             df_plot, x="Price", y=y_param, color="Type",
