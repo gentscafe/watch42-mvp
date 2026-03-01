@@ -47,26 +47,26 @@ st.markdown("""
 
 # 3. DATA ENGINE - FEARS PORTFOLIO + MARKET DATA
 fears_models = [
-    {"Model": "Brunswick 38 Copper", "Category": "Casual", "Year": 2022, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 4150},
-    {"Model": "Brunswick 40 Silver", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450},
-    {"Model": "Archival 1930 Small Seconds", "Category": "Dress", "Year": 2021, "Diameter": 22, "Thickness": 8.5, "Reserve": 40, "Price": 4200},
-    {"Model": "Brunswick 38 Blue Danubian", "Category": "Casual", "Year": 2023, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 4150},
-    {"Model": "Brunswick PT (Platinum)", "Category": "Luxury", "Year": 2023, "Diameter": 38, "Thickness": 12.1, "Reserve": 50, "Price": 33000},
-    {"Model": "Fears Garrick Collaboration", "Category": "High-End", "Year": 2022, "Diameter": 42, "Thickness": 10.0, "Reserve": 45, "Price": 19500},
-    {"Model": "Brunswick 40 Pinkish Salmon", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450},
-    {"Model": "Brunswick 38 White Rose", "Category": "Casual", "Year": 2022, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 4150},
-    {"Model": "Archival 1930 Topper Edition", "Category": "Dress", "Year": 2022, "Diameter": 22, "Thickness": 8.5, "Reserve": 40, "Price": 4500},
-    {"Model": "Brunswick 40 Aurora", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4600},
-    {"Model": "Brunswick 38 Champagne", "Category": "Casual", "Year": 2021, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 3950},
-    {"Model": "Brunswick 40 Mallard Green", "Category": "Casual", "Year": 2023, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450},
-    {"Model": "Brunswick 38 Midas Gold", "Category": "Luxury", "Year": 2023, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 15500},
-    {"Model": "Brunswick 38 Jubilee Edition", "Category": "Casual", "Year": 2022, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 4300},
-    {"Model": "Archival 1930 Boutique", "Category": "Dress", "Year": 2023, "Diameter": 22, "Thickness": 8.5, "Reserve": 40, "Price": 4200},
-    {"Model": "Brunswick 40 Blue", "Category": "Casual", "Year": 2023, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450},
-    {"Model": "Brunswick 38 Salmon", "Category": "Casual", "Year": 2020, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 3850},
-    {"Model": "Brunswick 40 Black", "Category": "Casual", "Year": 2023, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4450},
-    {"Model": "Brunswick 38 Silver", "Category": "Casual", "Year": 2021, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "Price": 3950},
-    {"Model": "Brunswick 40 Topper Edition", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "Price": 4700}
+    {"Model": "Brunswick 38 Copper", "Category": "Casual", "Year": 2022, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "WR": 50, "Price": 4150},
+    {"Model": "Brunswick 40 Silver", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "WR": 100, "Price": 4450},
+    {"Model": "Archival 1930 Small Seconds", "Category": "Dress", "Year": 2021, "Diameter": 22, "Thickness": 8.5, "Reserve": 40, "WR": 0, "Price": 4200},
+    {"Model": "Brunswick 38 Blue Danubian", "Category": "Casual", "Year": 2023, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "WR": 50, "Price": 4150},
+    {"Model": "Brunswick PT (Platinum)", "Category": "Luxury", "Year": 2023, "Diameter": 38, "Thickness": 12.1, "Reserve": 50, "WR": 50, "Price": 33000},
+    {"Model": "Fears Garrick Collaboration", "Category": "High-End", "Year": 2022, "Diameter": 42, "Thickness": 10.0, "Reserve": 45, "WR": 100, "Price": 19500},
+    {"Model": "Brunswick 40 Pinkish Salmon", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "WR": 100, "Price": 4450},
+    {"Model": "Brunswick 38 White Rose", "Category": "Casual", "Year": 2022, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "WR": 50, "Price": 4150},
+    {"Model": "Archival 1930 Topper Edition", "Category": "Dress", "Year": 2022, "Diameter": 22, "Thickness": 8.5, "Reserve": 40, "WR": 0, "Price": 4500},
+    {"Model": "Brunswick 40 Aurora", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "WR": 100, "Price": 4600},
+    {"Model": "Brunswick 38 Champagne", "Category": "Casual", "Year": 2021, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "WR": 50, "Price": 3950},
+    {"Model": "Brunswick 40 Mallard Green", "Category": "Casual", "Year": 2023, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "WR": 100, "Price": 4450},
+    {"Model": "Brunswick 38 Midas Gold", "Category": "Luxury", "Year": 2023, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "WR": 50, "Price": 15500},
+    {"Model": "Brunswick 38 Jubilee Edition", "Category": "Casual", "Year": 2022, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "WR": 50, "Price": 4300},
+    {"Model": "Archival 1930 Boutique", "Category": "Dress", "Year": 2023, "Diameter": 22, "Thickness": 8.5, "Reserve": 40, "WR": 0, "Price": 4200},
+    {"Model": "Brunswick 40 Blue", "Category": "Casual", "Year": 2023, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "WR": 100, "Price": 4450},
+    {"Model": "Brunswick 38 Salmon", "Category": "Casual", "Year": 2020, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "WR": 50, "Price": 3850},
+    {"Model": "Brunswick 40 Black", "Category": "Casual", "Year": 2023, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "WR": 100, "Price": 4450},
+    {"Model": "Brunswick 38 Silver", "Category": "Casual", "Year": 2021, "Diameter": 38, "Thickness": 11.8, "Reserve": 50, "WR": 50, "Price": 3950},
+    {"Model": "Brunswick 40 Topper Edition", "Category": "Casual", "Year": 2024, "Diameter": 40, "Thickness": 11.9, "Reserve": 68, "WR": 100, "Price": 4700}
 ]
 
 st.session_state.my_portfolio = fears_models
@@ -79,8 +79,8 @@ if 'competitors' not in st.session_state:
         st.session_state.competitors.append({
             "Brand": f"Brand {random.randint(1,50)}", "Model": f"M-{i}", 
             "Category": random.choice(["Casual", "Dress", "Luxury", "High-End"]), 
-            "Year": yr, "Diameter": random.choice([38, 39, 40, 41, 42]), "Thickness": random.uniform(9, 14), 
-            "Reserve": int(42 + (yr-2019)*5), "Price": random.randint(3000, 25000)
+            "Year": yr, "Diameter": random.choice([22, 38, 39, 40, 41, 42]), "Thickness": random.uniform(8, 14), 
+            "Reserve": int(42 + (yr-2019)*5), "Price": random.randint(3000, 25000), "WR": random.choice([0, 30, 50, 100])
         })
 
 # 4. CUSTOM SIDEBAR NAVIGATION
@@ -92,12 +92,12 @@ with st.sidebar:
     for n, icon in pages:
         st.button(f"{icon} {n}", key=f"btn_{n}", use_container_width=True, on_click=set_v, args=(n,))
     st.write("---")
-    st.caption("Fears Analytics v6.3")
+    st.caption("Fears Analytics v6.4")
 
 view = st.session_state.p_view
 df_all = pd.DataFrame(st.session_state.competitors)
 
-# --- 5. VIEW: DASHBOARD (Fears Catalog - No Images) ---
+# --- 5. VIEW: DASHBOARD ---
 if view == "Dashboard":
     st.markdown("### Fears Collection Overview")
     cols = st.columns(4)
@@ -112,26 +112,37 @@ if view == "Dashboard":
                 </div>
             """, unsafe_allow_html=True)
 
-# --- 6. VIEW: PRICING INTELLIGENCE ---
+# --- 6. VIEW: PRICING INTELLIGENCE (Migliorata) ---
 elif view == "Pricing Intelligence":
-    col_t1, col_t2 = st.columns([2, 1])
-    with col_t1: st.markdown("### Pricing Analysis")
-    with col_t2: target = st.selectbox("Select Model", st.session_state.my_portfolio, format_func=lambda x: x['Model'])
+    # Layout Filtri Superiore
+    col_t1, col_t2, col_t3 = st.columns([1.5, 1, 1])
+    with col_t1: 
+        st.markdown("### Pricing Analysis")
+    with col_t2: 
+        # Spostato a sinistra
+        target = st.selectbox("Select Model", st.session_state.my_portfolio, format_func=lambda x: x['Model'])
+    with col_t3:
+        # Aggiunto selettore parametro tecnico
+        y_param = st.selectbox("Technical Parameter", ["Reserve", "Thickness", "Diameter", "WR"])
     
     df_f = df_all[df_all['Category'] == target['Category']]
     avg_p = df_f['Price'].mean() if not df_f.empty else 0
     diff = ((target['Price'] - avg_p) / avg_p) * 100 if avg_p > 0 else 0
     
+    # Metrics Row
     m1, m2, m3, m4 = st.columns(4)
     for m, (label, val, delta) in zip([m1, m2, m3, m4], [("Category", target['Category'], None), ("Competitors", len(df_f), None), ("Market Avg", f"€ {avg_p:,.0f}", None), ("Positioning", f"€ {target['Price']:,}", f"{diff:+.1f}%")]):
         with m:
             delta_html = f'<div style="color:{"#10B981" if diff < 0 else "#EF4444"}; font-size:0.8rem; font-weight:600;">{delta} vs avg</div>' if delta else ""
             st.markdown(f'<div class="atlass-card"><div class="card-label">{label}</div><div class="card-value" style="font-size:1.2rem;">{val}</div>{delta_html}</div>', unsafe_allow_html=True)
     
+    # Grafico Dinamico
     st.markdown('<div class="atlass-card">', unsafe_allow_html=True)
-    fig_p = px.scatter(df_f, x="Price", y="Reserve", color_discrete_sequence=["#CBD5E0"], opacity=0.4)
-    fig_p.add_trace(go.Scatter(x=[target['Price']], y=[target['Reserve']], mode='markers+text', text=[target['Model']], textposition="top center", marker=dict(color='#d4af37', size=15, line=dict(width=2, color='white'))))
-    fig_p.update_layout(template="plotly_white", height=400, margin=dict(l=0,r=0,t=20,b=0), showlegend=False)
+    fig_p = px.scatter(df_f, x="Price", y=y_param, color_discrete_sequence=["#CBD5E0"], opacity=0.4, 
+                       labels={"Price": "Price (€)", y_param: f"{y_param} Axis"})
+    fig_p.add_trace(go.Scatter(x=[target['Price']], y=[target[y_param]], mode='markers+text', text=[target['Model']], 
+                               textposition="top center", marker=dict(color='#d4af37', size=15, line=dict(width=2, color='white'))))
+    fig_p.update_layout(template="plotly_white", height=450, margin=dict(l=0,r=0,t=20,b=0), showlegend=False)
     st.plotly_chart(fig_p, use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
@@ -156,7 +167,7 @@ elif view == "Design Grid":
         st.plotly_chart(fig_h, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     with col_m2:
-        st.markdown(f'<div class="atlass-card" style="height:495px;"><div class="card-label">Strategic Insights</div><div class="card-value">{len(df_f_design)} Models</div><hr style="border:0; border-top:1px solid #E2E8F0; margin:20px 0;"><div style="font-size:0.9rem; color:#475569;"><b>White Space Detected:</b><br>Low competition in dimensions below 39mm for the {sel_cat} segment.</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="atlass-card" style="height:495px;"><div class="card-label">Strategic Insights</div><div class="card-value">{len(df_f_design)} Models</div><hr style="border:0; border-top:1px solid #E2E8F0; margin:20px 0;"><div style="font-size:0.9rem; color:#475569;"><b>White Space:</b><br>Low competition in dimensions below 39mm for the {sel_cat} segment.</div></div>', unsafe_allow_html=True)
 
 # --- 8. VIEW: MARKET TRENDS ---
 elif view == "Market Trends":
