@@ -46,16 +46,14 @@ if 'initialized' not in st.session_state:
             "Type": "Target" if is_target else "Market"
         }
 
+    # Creazione dei 5 modelli "MY BRAND" con i nomi richiesti
     st.session_state.my_portfolio = [
-        create_mock_watch("MY BRAND", "Aethelgard I", "MB-01", True),
-        create_mock_watch("MY BRAND", "Nebula Chrono", "MB-02", True),
-        create_mock_watch("MY BRAND", "Deep Horizon", "MB-03", True),
-        create_mock_watch("MY BRAND", "Urban Ghost", "MB-04", True),
-        create_mock_watch("MY BRAND", "Vertex GMT", "MB-05", True),
+        create_mock_watch("MY BRAND", f"My watch {i}", f"MB-0{i}", True)
+        for i in range(1, 6)
     ]
     
     st.session_state.competitors = [
-        create_mock_watch(f"Brand {random.randint(1,20)}", f"Legacy {10+i}", f"REF-{1000+i}") 
+        create_mock_watch(f"Brand {random.randint(1,20)}", f"Competitor Model {i}", f"REF-{1000+i}") 
         for i in range(1, 251)
     ]
     st.session_state.initialized = True
@@ -66,7 +64,7 @@ with st.sidebar:
     st.write("---")
     view = st.radio("Sezione", ["My Watches", "Pricing Intelligence"])
     st.write("---")
-    st.caption("v1.4 - Smart Benchmarking")
+    st.caption("v1.5 - Updated Naming")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
@@ -100,7 +98,6 @@ elif view == "Pricing Intelligence":
     with col_filter2:
         y_param = st.selectbox("Parametro Tecnico", list(units.keys()))
 
-    # Logica di Filtro
     target_cat = target['Category']
     target_value = target[y_param]
     unit_y = units[y_param]
@@ -111,18 +108,14 @@ elif view == "Pricing Intelligence":
         (df_market[y_param] == target_value)
     ].copy()
 
-    # --- SEZIONE KPI ---
     st.write("---")
     if not df_filtered.empty:
         avg_p = df_filtered['Price'].mean()
-        # Calcolo scostamento percentuale
         diff_pct = ((target['Price'] - avg_p) / avg_p) * 100
         
-        # Layout a 3 colonne (senza PPI separato)
         k1, k2, k3 = st.columns(3)
         k1.metric("Competitor Diretti", len(df_filtered))
         k2.metric("Prezzo Medio Mercato", f"€ {avg_p:,.0f}")
-        # La percentuale viene mostrata come 'delta' sotto il tuo prezzo
         k3.metric(
             label="Il Tuo Prezzo", 
             value=f"€ {target['Price']:,}", 
@@ -132,7 +125,6 @@ elif view == "Pricing Intelligence":
         
         st.write("---")
 
-        # --- GRAFICO ---
         df_plot = pd.concat([df_filtered, pd.DataFrame([target])])
         fig = px.scatter(
             df_plot, x="Price", y=y_param, color="Type",
