@@ -27,7 +27,7 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
-# 3. GENERAZIONE DATI STATICI (Sempre uguali grazie al Seed)
+# 3. GENERAZIONE DATI STATICI
 if 'initialized' not in st.session_state:
     random.seed(42)
     np.random.seed(42)
@@ -56,7 +56,7 @@ if 'initialized' not in st.session_state:
     
     st.session_state.competitors = [
         create_mock_watch(f"Brand {random.randint(1,20)}", f"Legacy {10+i}", f"REF-{1000+i}") 
-        for i in range(1, 251) # 250 competitor per avere dati densi
+        for i in range(1, 251)
     ]
     st.session_state.initialized = True
 
@@ -66,7 +66,7 @@ with st.sidebar:
     st.write("---")
     view = st.radio("Sezione", ["My Watches", "Pricing Intelligence"])
     st.write("---")
-    st.caption("v1.3 - Dashboard KPI")
+    st.caption("v1.4 - Smart Benchmarking")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
@@ -100,7 +100,7 @@ elif view == "Pricing Intelligence":
     with col_filter2:
         y_param = st.selectbox("Parametro Tecnico", list(units.keys()))
 
-    # Logica di Filtro Automatica
+    # Logica di Filtro
     target_cat = target['Category']
     target_value = target[y_param]
     unit_y = units[y_param]
@@ -115,16 +115,20 @@ elif view == "Pricing Intelligence":
     st.write("---")
     if not df_filtered.empty:
         avg_p = df_filtered['Price'].mean()
-        # KPI 1: Price Positioning Index (PPI)
-        ppi = ((target['Price'] - avg_p) / avg_p) * 100
-        # KPI 2: Technical Value Ratio (Esempio: Prezzo per ora di Riserva se Reserve è selezionato)
-        tv_ratio = target['Price'] / target['Reserve'] if target['Reserve'] > 0 else 0
+        # Calcolo scostamento percentuale
+        diff_pct = ((target['Price'] - avg_p) / avg_p) * 100
         
-        k1, k2, k3, k4 = st.columns(4)
+        # Layout a 3 colonne (senza PPI separato)
+        k1, k2, k3 = st.columns(3)
         k1.metric("Competitor Diretti", len(df_filtered))
-        k2.metric("Media Prezzo Mercato", f"€ {avg_p:,.0f}")
-        k3.metric("Il tuo Prezzo", f"€ {target['Price']:,}")
-        k4.metric("PPI Index", f"{ppi:+.1f}%", delta=f"{ppi:+.1f}% vs media", delta_color="inverse")
+        k2.metric("Prezzo Medio Mercato", f"€ {avg_p:,.0f}")
+        # La percentuale viene mostrata come 'delta' sotto il tuo prezzo
+        k3.metric(
+            label="Il Tuo Prezzo", 
+            value=f"€ {target['Price']:,}", 
+            delta=f"{diff_pct:+.1f}% rispetto alla media",
+            delta_color="inverse"
+        )
         
         st.write("---")
 
@@ -145,4 +149,4 @@ elif view == "Pricing Intelligence":
         )
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.warning(f"Nessun competitor trovato in categoria '{target_cat}' con {target_value} {unit_y}. Prova a cambiare parametro.")
+        st.warning(f"Nessun competitor trovato in categoria '{target_cat}' con {target_value} {unit_y}.")
