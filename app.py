@@ -4,45 +4,43 @@ import plotly.express as px
 import numpy as np
 import random
 
-# 1. CONFIGURAZIONE PAGINA
+# 1. PAGE CONFIGURATION
 st.set_page_config(page_title="watch42 | Intelligence", layout="wide", initial_sidebar_state="expanded")
 
-# 2. STILE UI (CSS Rifinito con più respiro)
+# 2. UI STYLE (CSS Custom for Global Header and Space Reduction)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-    /* Header Fisso con più padding */
+    /* Fixed Header */
     .global-header {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
-        height: 70px; /* Leggermente più alto */
+        height: 60px;
         background-color: white;
         display: flex;
         align-items: center;
-        padding: 0 40px; /* Più spazio ai lati */
+        padding: 0 20px;
         border-bottom: 1px solid #eee;
         z-index: 999999;
     }
     
     .logo-text {
         font-weight: 700;
-        font-size: 1.6rem;
+        font-size: 1.4rem;
         color: #1a1a1a;
         letter-spacing: -0.5px;
     }
     .logo-accent { color: #d4af37; }
 
-    /* DISTANZIAMENTO CONTENUTO */
+    /* REDUCE STREAMLIT WHITE SPACES */
     .block-container {
-        padding-top: 5rem !important; /* Più spazio tra header e contenuto */
-        padding-bottom: 2rem !important;
-        padding-left: 3rem !important;
-        padding-right: 3rem !important;
+        padding-top: 2rem !important;
+        padding-bottom: 0rem !important;
     }
     
     [data-testid="stHeader"] {
@@ -51,15 +49,15 @@ st.markdown("""
 
     /* Cards UI */
     .watch-tile {
-        background-color: white; padding: 25px; border-radius: 12px;
-        border: 1px solid #eee; box-shadow: 0 4px 10px rgba(0,0,0,0.02);
-        margin-bottom: 15px; min-height: 200px;
+        background-color: white; padding: 20px; border-radius: 10px;
+        border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+        margin-bottom: 10px; min-height: 180px;
     }
-    .watch-title { font-size: 1.1rem; font-weight: 600; color: #111; margin-top: 12px; }
-    .watch-price { font-size: 1.2rem; font-weight: 500; color: #d4af37; margin-top: 6px; }
+    .watch-title { font-size: 1.05rem; font-weight: 600; color: #111; margin-top: 10px; }
+    .watch-price { font-size: 1.15rem; font-weight: 500; color: #d4af37; margin-top: 5px; }
     .category-badge { 
-        background-color: #f3f4f6; color: #374151; padding: 4px 10px; 
-        border-radius: 5px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+        background-color: #f3f4f6; color: #374151; padding: 2px 8px; 
+        border-radius: 4px; font-size: 0.65rem; font-weight: 700; text-transform: uppercase;
     }
     </style>
     
@@ -68,7 +66,7 @@ st.markdown("""
     </div>
     """, unsafe_allow_html=True)
 
-# 3. GENERAZIONE DATI STATICI
+# 3. STATIC DATA GENERATION
 if 'initialized' not in st.session_state:
     random.seed(42)
     np.random.seed(42)
@@ -100,11 +98,10 @@ if 'initialized' not in st.session_state:
 
 # 4. SIDEBAR
 with st.sidebar:
-    st.markdown("<br><br>", unsafe_allow_html=True) # Spazio per non finire sotto l'header
-    st.write("### Navigazione")
-    view = st.radio("Sezioni", ["My Watches", "Pricing Intelligence"])
+    st.write("### Navigation")
+    view = st.radio("Sections", ["My Watches", "Pricing Intelligence"])
     st.write("---")
-    st.caption("watch42 Intelligence v1.9.1")
+    st.caption("Intelligence SaaS v2.0")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
@@ -119,22 +116,21 @@ if view == "My Watches":
                     <div class="watch-price">€ {watch['Price']:,}</div>
                 </div>
             """, unsafe_allow_html=True)
-            with st.expander("Specifiche"):
+            with st.expander("Specifications"):
                 st.write(f"**Ref:** {watch['Ref']}")
-                st.write(f"**Riserva:** {watch['Reserve']}h")
+                st.write(f"**Power Reserve:** {watch['Reserve']}h")
+                st.write(f"**Frequency:** {watch['Freq']}vph")
 
 # 6. VIEW: PRICING INTELLIGENCE
 elif view == "Pricing Intelligence":
-    units = {"Reserve": "h", "Thickness": "mm", "WR": "m", "Freq": "vph", "Diameter": "mm"}
     
-    # Spazio extra sopra i filtri
-    st.markdown("<div style='margin-top: 10px;'></div>", unsafe_allow_html=True)
+    units = {"Reserve": "h", "Thickness": "mm", "WR": "m", "Freq": "vph", "Diameter": "mm"}
     
     col_f1, col_f2 = st.columns(2)
     with col_f1:
-        target = st.selectbox("Seleziona Target", st.session_state.my_portfolio, format_func=lambda x: x['Model'])
+        target = st.selectbox("Select Target Watch", st.session_state.my_portfolio, format_func=lambda x: x['Model'])
     with col_f2:
-        y_param = st.selectbox("Parametro Tecnico", list(units.keys()))
+        y_param = st.selectbox("Technical Parameter", list(units.keys()))
 
     target_cat = target['Category']
     target_value = target[y_param]
@@ -150,14 +146,13 @@ elif view == "Pricing Intelligence":
         avg_p = df_filtered['Price'].mean()
         diff_pct = ((target['Price'] - avg_p) / avg_p) * 100
         
-        st.markdown("<br>", unsafe_allow_html=True)
-        
+        # KPI Section
         k1, k2, k3, k4 = st.columns(4)
-        k1.metric("Categoria", target_cat)
-        k2.metric("Competitor", len(df_filtered))
-        k3.metric("Media Mercato", f"€ {avg_p:,.0f}")
-        k4.metric(label="Il Tuo Prezzo", value=f"€ {target['Price']:,}", 
-                  delta=f"{diff_pct:+.1f}% vs media", delta_color="inverse")
+        k1.metric("Analysed Category", target_cat)
+        k2.metric("Direct Competitors", len(df_filtered))
+        k3.metric("Market Average Price", f"€ {avg_p:,.0f}")
+        k4.metric(label="Your Price", value=f"€ {target['Price']:,}", 
+                  delta=f"{diff_pct:+.1f}% vs average", delta_color="inverse")
         
         st.write("---")
 
@@ -167,15 +162,15 @@ elif view == "Pricing Intelligence":
             color_discrete_map={"Market": "#CBD5E0", "Target": "#D4AF37"},
             size=df_plot['Type'].apply(lambda x: 25 if x == "Target" else 15),
             hover_name="Model",
-            labels={"Price": "Prezzo (€)", y_param: f"{y_param} ({unit_y})"},
+            labels={"Price": "Price (€)", y_param: f"{y_param} ({unit_y})"},
             template="plotly_white", height=500
         )
         fig.update_layout(
-            margin=dict(l=0, r=0, t=30, b=0),
+            margin=dict(l=0, r=0, t=20, b=0),
             xaxis=dict(ticksuffix=" €", gridcolor="#f0f0f0"),
             yaxis=dict(range=[target_value * 0.8, target_value * 1.2], ticksuffix=f" {unit_y}"),
             showlegend=False
         )
         st.plotly_chart(fig, use_container_width=True)
     else:
-        st.warning(f"Nessun competitor trovato in categoria '{target_cat}' con {target_value} {unit_y}.")
+        st.warning(f"No competitors found in the '{target_cat}' category with {target_value} {unit_y} {y_param}.")
