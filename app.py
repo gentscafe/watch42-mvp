@@ -46,7 +46,7 @@ if 'initialized' not in st.session_state:
             "Type": "Target" if is_target else "Market"
         }
 
-    # Creazione dei 5 modelli "MY BRAND" con i nomi richiesti
+    # Creazione dei 5 modelli "MY BRAND"
     st.session_state.my_portfolio = [
         create_mock_watch("MY BRAND", f"My watch {i}", f"MB-0{i}", True)
         for i in range(1, 6)
@@ -64,7 +64,7 @@ with st.sidebar:
     st.write("---")
     view = st.radio("Sezione", ["My Watches", "Pricing Intelligence"])
     st.write("---")
-    st.caption("v1.5 - Updated Naming")
+    st.caption("v1.6 - KPI context enhanced")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
@@ -94,10 +94,11 @@ elif view == "Pricing Intelligence":
     with col_filter1:
         target = st.selectbox("Seleziona Target (MY BRAND)", 
                              st.session_state.my_portfolio, 
-                             format_func=lambda x: f"{x['Model']} ({x['Category']})")
+                             format_func=lambda x: f"{x['Model']}")
     with col_filter2:
         y_param = st.selectbox("Parametro Tecnico", list(units.keys()))
 
+    # Logica di Filtro automatica per categoria del target
     target_cat = target['Category']
     target_value = target[y_param]
     unit_y = units[y_param]
@@ -113,18 +114,22 @@ elif view == "Pricing Intelligence":
         avg_p = df_filtered['Price'].mean()
         diff_pct = ((target['Price'] - avg_p) / avg_p) * 100
         
-        k1, k2, k3 = st.columns(3)
-        k1.metric("Competitor Diretti", len(df_filtered))
-        k2.metric("Prezzo Medio Mercato", f"€ {avg_p:,.0f}")
-        k3.metric(
+        # --- SEZIONE KPI A 4 COLONNE ---
+        k1, k2, k3, k4 = st.columns(4)
+        
+        k1.metric("Categoria Analizzata", target_cat)
+        k2.metric("Competitor Diretti", len(df_filtered))
+        k3.metric("Prezzo Medio Mercato", f"€ {avg_p:,.0f}")
+        k4.metric(
             label="Il Tuo Prezzo", 
             value=f"€ {target['Price']:,}", 
-            delta=f"{diff_pct:+.1f}% rispetto alla media",
+            delta=f"{diff_pct:+.1f}% vs media",
             delta_color="inverse"
         )
         
         st.write("---")
 
+        # --- GRAFICO ---
         df_plot = pd.concat([df_filtered, pd.DataFrame([target])])
         fig = px.scatter(
             df_plot, x="Price", y=y_param, color="Type",
