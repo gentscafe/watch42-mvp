@@ -8,7 +8,7 @@ import random
 # 1. PAGE CONFIGURATION
 st.set_page_config(page_title="watch42 | Intelligence", layout="wide", initial_sidebar_state="expanded")
 
-# 2. UI STYLE (Fixed Header & Layout)
+# 2. UI STYLE
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
@@ -37,7 +37,7 @@ st.markdown("""
     </div>
     """, unsafe_allow_html=True)
 
-# 3. STATIC DATA GENERATION (Unified Seed)
+# 3. STATIC DATA GENERATION
 if 'initialized' not in st.session_state:
     random.seed(42)
     np.random.seed(42)
@@ -71,7 +71,7 @@ with st.sidebar:
     st.write("### Navigation")
     view = st.radio("Sections", ["My Watches", "Pricing Intelligence", "Design Intelligence"])
     st.write("---")
-    st.caption("Intelligence SaaS v3.0")
+    st.caption("Intelligence SaaS v3.1")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
@@ -121,24 +121,22 @@ elif view == "Pricing Intelligence":
     else:
         st.warning("No matches found.")
 
-# 7. VIEW: DESIGN INTELLIGENCE (Clean Header)
+# 7. VIEW: DESIGN INTELLIGENCE (Ultra-Clean)
 elif view == "Design Intelligence":
-    # Titolo rimosso come richiesto
+    # All titles and captions removed as requested
     
     col_h1, col_h2 = st.columns([2, 1])
-    with col_h1:
-        st.caption("Strategic White Space Heatmap: identify market gaps in case proportions.")
     with col_h2:
         design_year_range = st.slider("Production Year Filter", 2015, 2025, (2018, 2024))
 
     df_all = pd.DataFrame(st.session_state.competitors)
     df_f_design = df_all[df_all['Year'].between(design_year_range[0], design_year_range[1])].copy()
     
-    # Grid Data
+    # Process Matrix
     matrix_df = df_f_design.groupby(['Diameter', 'Thickness']).size().reset_index(name='count')
     pivot_table = matrix_df.pivot(index='Thickness', columns='Diameter', values='count').fillna(0)
 
-    # Matrix Plot
+    # Generate Heatmap
     fig = go.Figure(data=go.Heatmap(
         z=pivot_table.values, x=pivot_table.columns, y=pivot_table.index,
         colorscale=[[0, '#27ae60'], [0.1, '#f1c40f'], [0.5, '#e67e22'], [1.0, '#c0392b']],
@@ -151,7 +149,7 @@ elif view == "Design Intelligence":
 
     st.plotly_chart(fig, use_container_width=True)
 
-    # Drill-down Inspector
+    # Inspector Section
     st.write("---")
     st.write("### 🔍 Cell Inspector")
     c1, c2, c3 = st.columns([1, 1, 2])
@@ -167,4 +165,4 @@ elif view == "Design Intelligence":
             st.dataframe(cell_list[["Brand", "Model", "Year", "Price", "Category"]].sort_values("Price"), 
                          use_container_width=True, hide_index=True)
         else:
-            st.info("White Space: No competitors found in this dimensional coordinate.")
+            st.info("No competitors found in this dimensional coordinate.")
