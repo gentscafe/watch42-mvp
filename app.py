@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import plotly.graph_objects as go
 import numpy as np
 import random
 
@@ -48,11 +49,23 @@ if 'initialized' not in st.session_state:
         cat = random.choice(categories)
         price = random.randint(1200, 3500) if is_target else random.randint(800, 4500)
         prod_year = year if year else random.randint(2018, 2024)
+        
+        # Generazione dimensioni fisiche coerenti per la Heatmap
+        if cat == "Diver":
+            diam = random.choice([41.0, 42.0, 43.0, 44.0])
+            thick = random.choice([13.0, 13.5, 14.0, 14.5, 15.0])
+        elif cat == "Dress":
+            diam = random.choice([36.0, 37.0, 38.0, 39.0])
+            thick = random.choice([8.0, 8.5, 9.0, 10.0])
+        else:
+            diam = random.choice([38.0, 39.0, 40.0, 41.0, 42.0])
+            thick = random.choice([10.5, 11.0, 12.0, 13.0])
+
         return {
             "Brand": brand, "Model": model, "Ref": ref, "Price": price,
             "Category": cat, "Year": prod_year, "Material": "Steel", 
-            "Diameter": random.choice([38.0, 39.0, 40.0, 41.0, 42.0]),
-            "Thickness": random.choice([10.5, 12.0, 13.5, 14.5]),
+            "Diameter": diam,
+            "Thickness": thick,
             "WR": random.choice([50, 100, 200, 300]), 
             "Reserve": random.choice([42, 70, 80]),
             "Freq": random.choice([21600, 28800]), 
@@ -67,16 +80,16 @@ if 'initialized' not in st.session_state:
     
     st.session_state.competitors = [
         create_mock_watch(f"Brand {random.randint(1,20)}", f"Comp Model {i}", f"REF-{1000+i}") 
-        for i in range(1, 401)
+        for i in range(1, 601) # Aumentati per popolare meglio la heatmap
     ]
     st.session_state.initialized = True
 
 # 4. SIDEBAR
 with st.sidebar:
     st.write("### Navigation")
-    view = st.radio("Sections", ["My Watches", "Pricing Intelligence"])
+    view = st.radio("Sections", ["My Watches", "Pricing Intelligence", "Design Intelligence"])
     st.write("---")
-    st.caption("Intelligence SaaS v2.3")
+    st.caption("Intelligence SaaS v2.4")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
@@ -94,6 +107,7 @@ if view == "My Watches":
             with st.expander("Specs"):
                 st.write(f"**Ref:** {watch['Ref']}")
                 st.write(f"**Reserve:** {watch['Reserve']}h")
+                st.write(f"**Dim:** {watch['Diameter']}mm x {watch['Thickness']}mm")
 
 # 6. VIEW: PRICING INTELLIGENCE
 elif view == "Pricing Intelligence":
@@ -101,7 +115,6 @@ elif view == "Pricing Intelligence":
     
     col_f1, col_f2, col_f3 = st.columns([1.2, 1, 1.3])
     with col_f1:
-        # AGGIORNATO: Visualizzazione Categoria e Anno nel menu a tendina
         target = st.selectbox(
             "Select Target Watch", 
             st.session_state.my_portfolio, 
@@ -117,7 +130,6 @@ elif view == "Pricing Intelligence":
             value=(t_year - 1, t_year + 1)
         )
 
-    # FILTERING
     df_market = pd.DataFrame(st.session_state.competitors)
     df_filtered = df_market[
         (df_market['Category'] == target['Category']) & 
@@ -140,7 +152,6 @@ elif view == "Pricing Intelligence":
         
         st.write("---")
         
-        # Plot
         df_plot = pd.concat([df_filtered, pd.DataFrame([target])])
         fig = px.scatter(
             df_plot, x="Price", y=y_param, color="Type",
@@ -160,3 +171,52 @@ elif view == "Pricing Intelligence":
         st.plotly_chart(fig, use_container_width=True)
     else:
         st.warning(f"No competitors found in '{target['Category']}' with {target[y_param]} {units[y_param]} between {year_range[0]}-{year_range[1]}.")
+
+# 7. VIEW: DESIGN INTELLIGENCE
+elif view == "Design Intelligence":
+    st.subheader("White Space Heatmap")
+    st.caption("Strategic mapping of case proportions (Diameter vs Thickness) to identify market opportunities.")
+
+    df_all = pd.DataFrame(st.session_state.competitors)
+    
+    # Creazione della matrice di frequenza per la Heatmap
+    heatmap_df = df_all.groupby(['Diameter', 'Thickness']).size().reset_index(name='count')
+    pivot_table = heatmap_df.pivot(index='Thickness', columns='Diameter', values='count').fillna(0)
+
+    # Definizione Scala Colore Semaforica (Verde -> Giallo -> Rosso)
+    # 0-1: Verde, 2-5: Giallo/Arancio, 10+: Rosso
+    custom_colorscale = [
+        [0, 'rgb(39, 174, 96)'],    # Verde (White Space)
+        [0.1, 'rgb(241, 196, 15)'], # Giallo (Low Saturation)
+        [0.5, 'rgb(230, 126, 34)'], # Arancio (Medium Saturation)
+        [1.0, 'rgb(192, 57, 43)']   # Rosso (High Saturation)
+    ]
+
+    fig = go.Figure(data=go.Heatmap(
+        z=pivot_table.values,
+        x=pivot_table.columns,
+        y=pivot_table.index,
+        colorscale=custom_colorscale,
+        showscale=True,
+        hovertemplate="Diameter: %{x}mm<br>Thickness: %{y}mm<br>Competitors: %{z}<extra></extra>"
+    ))
+
+    fig.update_layout(
+        xaxis_title="Case Diameter (mm)",
+        yaxis_title="Case Thickness (mm)",
+        template="plotly_white",
+        height=600,
+        margin=dict(l=0, r=0, t=30, b=0)
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    # Pannello KPI Strategici per il CEO
+    st.write("---")
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.success("**White Space Opportunity**\n\nGreen areas indicate segments with 0-1 competitors. Ideal for unique R&D positioning.")
+    with c2:
+        st.warning("**Saturated Segment**\n\nYellow/Orange areas show established trends. Success here requires high marketing spend.")
+    with c3:
+        st.error("**Red Ocean**\n\nRed areas are overcrowded (10+ competitors). High price sensitivity and fierce competition.")
