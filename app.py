@@ -8,7 +8,7 @@ import random
 # 1. CONFIGURAZIONE PAGINA
 st.set_page_config(page_title="watch42 | Fears Intelligence", layout="wide", initial_sidebar_state="expanded")
 
-# 2. UI STYLE - TOTAL ATLAS DESIGN
+# 2. UI STYLE - TOTAL ATLAS DESIGN (v6.5)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -92,7 +92,7 @@ with st.sidebar:
     for n, icon in pages:
         st.button(f"{icon} {n}", key=f"btn_{n}", use_container_width=True, on_click=set_v, args=(n,))
     st.write("---")
-    st.caption("Fears Analytics v6.4")
+    st.caption("Fears Analytics v6.5")
 
 view = st.session_state.p_view
 df_all = pd.DataFrame(st.session_state.competitors)
@@ -112,31 +112,27 @@ if view == "Dashboard":
                 </div>
             """, unsafe_allow_html=True)
 
-# --- 6. VIEW: PRICING INTELLIGENCE (Migliorata) ---
+# --- 6. VIEW: PRICING INTELLIGENCE (BARRA RIMOSSA) ---
 elif view == "Pricing Intelligence":
-    # Layout Filtri Superiore
     col_t1, col_t2, col_t3 = st.columns([1.5, 1, 1])
     with col_t1: 
         st.markdown("### Pricing Analysis")
     with col_t2: 
-        # Spostato a sinistra
         target = st.selectbox("Select Model", st.session_state.my_portfolio, format_func=lambda x: x['Model'])
     with col_t3:
-        # Aggiunto selettore parametro tecnico
         y_param = st.selectbox("Technical Parameter", ["Reserve", "Thickness", "Diameter", "WR"])
     
     df_f = df_all[df_all['Category'] == target['Category']]
     avg_p = df_f['Price'].mean() if not df_f.empty else 0
     diff = ((target['Price'] - avg_p) / avg_p) * 100 if avg_p > 0 else 0
     
-    # Metrics Row
     m1, m2, m3, m4 = st.columns(4)
     for m, (label, val, delta) in zip([m1, m2, m3, m4], [("Category", target['Category'], None), ("Competitors", len(df_f), None), ("Market Avg", f"€ {avg_p:,.0f}", None), ("Positioning", f"€ {target['Price']:,}", f"{diff:+.1f}%")]):
         with m:
             delta_html = f'<div style="color:{"#10B981" if diff < 0 else "#EF4444"}; font-size:0.8rem; font-weight:600;">{delta} vs avg</div>' if delta else ""
             st.markdown(f'<div class="atlass-card"><div class="card-label">{label}</div><div class="card-value" style="font-size:1.2rem;">{val}</div>{delta_html}</div>', unsafe_allow_html=True)
     
-    # Grafico Dinamico
+    # Rimossa la barra bianca vuota qui
     st.markdown('<div class="atlass-card">', unsafe_allow_html=True)
     fig_p = px.scatter(df_f, x="Price", y=y_param, color_discrete_sequence=["#CBD5E0"], opacity=0.4, 
                        labels={"Price": "Price (€)", y_param: f"{y_param} Axis"})
@@ -167,7 +163,7 @@ elif view == "Design Grid":
         st.plotly_chart(fig_h, use_container_width=True)
         st.markdown('</div>', unsafe_allow_html=True)
     with col_m2:
-        st.markdown(f'<div class="atlass-card" style="height:495px;"><div class="card-label">Strategic Insights</div><div class="card-value">{len(df_f_design)} Models</div><hr style="border:0; border-top:1px solid #E2E8F0; margin:20px 0;"><div style="font-size:0.9rem; color:#475569;"><b>White Space:</b><br>Low competition in dimensions below 39mm for the {sel_cat} segment.</div></div>', unsafe_allow_html=True)
+        st.markdown(f'<div class="atlass-card" style="height:495px;"><div class="card-label">Strategic Insights</div><div class="card-value">{len(df_f_design)} Models</div><hr style="border:0; border-top:1px solid #E2E8F0; margin:20px 0;"><div style="font-size:0.9rem; color:#475569;"><b>White Space Detected:</b><br>Low competition in dimensions below 39mm for the {sel_cat} segment.</div></div>', unsafe_allow_html=True)
 
 # --- 8. VIEW: MARKET TRENDS ---
 elif view == "Market Trends":
