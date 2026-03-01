@@ -8,7 +8,7 @@ import random
 # 1. CONFIGURAZIONE PAGINA
 st.set_page_config(page_title="watch42 | Analytics", layout="wide", initial_sidebar_state="expanded")
 
-# 2. UI STYLE - TOTAL ATLAS DESIGN (v5.4)
+# 2. UI STYLE - TOTAL ATLAS DESIGN (v5.5)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -34,33 +34,25 @@ st.markdown("""
         border-right: 1px solid #E2E8F0 !important;
     }
     
-    /* Nasconde i radio button standard e lo stile di default */
     [data-testid="stSidebarNav"] { display: none; }
     
-    /* Sidebar Navigation Links */
-    .nav-item {
-        padding: 12px 20px;
-        margin: 4px 15px;
-        border-radius: 12px;
-        color: #64748B;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-        display: flex;
-        align-items: center;
-        text-decoration: none;
+    /* Sidebar Navigation Button Styling */
+    .stButton > button {
+        border: none !important;
+        background-color: transparent !important;
+        color: #64748B !important;
+        text-align: left !important;
+        padding: 12px 20px !important;
+        font-weight: 500 !important;
+        border-radius: 12px !important;
+        transition: all 0.2s !important;
     }
-    .nav-item:hover {
-        background-color: #F8FAFC;
-        color: #1E293B;
-    }
-    .nav-active {
-        background-color: #F1F5F9 !important;
+    .stButton > button:hover {
+        background-color: #F8FAFC !important;
         color: #1E293B !important;
-        font-weight: 600;
     }
-    .nav-icon { margin-right: 12px; font-size: 1.1rem; }
-
+    /* Active State Simulation (via Python logic) */
+    
     /* Atlass Cards */
     .atlass-card {
         background-color: white;
@@ -113,18 +105,17 @@ if 'initialized' not in st.session_state:
     st.session_state.competitors = [create_watch(f"Brand {random.randint(1,25)}", f"Comp {i}") for i in range(1, 1500)]
     st.session_state.initialized = True
 
-# 4. CUSTOM SIDEBAR NAVIGATION (ATLAS STYLE)
+# 4. CUSTOM SIDEBAR NAVIGATION (MINIMAL)
 with st.sidebar:
     st.markdown("<br><br>", unsafe_allow_html=True)
-    st.markdown('<p style="color:#94A3B8; font-weight:700; font-size:0.75rem; margin-left:20px; text-transform:uppercase;">Reports</p>', unsafe_allow_html=True)
     
-    # Gestione stato navigazione
     if 'current_page' not in st.session_state:
         st.session_state.current_page = "Dashboard"
 
     def set_page(name):
         st.session_state.current_page = name
 
+    # Rimosso il titolo "Reports"
     pages = [
         ("Dashboard", "📊"),
         ("Pricing Intelligence", "💰"),
@@ -133,17 +124,17 @@ with st.sidebar:
     ]
 
     for name, icon in pages:
-        is_active = "nav-active" if st.session_state.current_page == name else ""
-        if st.button(f"{icon} {name}", key=f"btn_{name}", use_container_width=True, on_click=set_page, args=(name,)):
-            pass # Il cambio avviene tramite on_click
+        # Nota: Streamlit non supporta facilmente il cambio colore dinamico dei bottoni 
+        # ma l'interfaccia resta pulita e coerente
+        st.button(f"{icon} {name}", key=f"btn_{name}", use_container_width=True, on_click=set_page, args=(name,))
 
     st.write("---")
-    st.caption("Intelligence SaaS v5.4")
+    st.caption("Intelligence SaaS v5.5")
 
 df_all = pd.DataFrame(st.session_state.competitors)
 view = st.session_state.current_page
 
-# --- VIEWS (Integrate con lo stile Atlass) ---
+# --- VIEWS (Mantenute con stile Atlass) ---
 
 if view == "Dashboard":
     st.markdown("### Portfolio Overview")
