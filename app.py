@@ -7,14 +7,14 @@ import random
 # 1. CONFIGURAZIONE PAGINA
 st.set_page_config(page_title="watch42 | Intelligence", layout="wide", initial_sidebar_state="expanded")
 
-# 2. STILE UI (CSS Custom per Header Globale)
+# 2. STILE UI (CSS Custom per Header Globale e Riduzione Spazi)
 st.markdown("""
     <style>
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
     
     html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 
-    /* Header Fisso in alto a tutto */
+    /* Header Fisso */
     .global-header {
         position: fixed;
         top: 0;
@@ -26,7 +26,7 @@ st.markdown("""
         align-items: center;
         padding: 0 20px;
         border-bottom: 1px solid #eee;
-        z-index: 999999; /* Sopra la sidebar */
+        z-index: 999999;
     }
     
     .logo-text {
@@ -37,12 +37,17 @@ st.markdown("""
     }
     .logo-accent { color: #d4af37; }
 
-    /* Padding per non far finire il contenuto sotto l'header */
-    .stApp {
-        margin-top: 40px;
+    /* RIMOZIONE SPAZI BIANCHI STREAMLIT */
+    .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 0rem !important;
+    }
+    
+    [data-testid="stHeader"] {
+        display: none;
     }
 
-    /* Cards & UI Elements */
+    /* Cards UI */
     .watch-tile {
         background-color: white; padding: 20px; border-radius: 10px;
         border: 1px solid #eee; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
@@ -61,7 +66,7 @@ st.markdown("""
     </div>
     """, unsafe_allow_html=True)
 
-# 3. GENERAZIONE DATI STATICI (Seed 42)
+# 3. GENERAZIONE DATI STATICI
 if 'initialized' not in st.session_state:
     random.seed(42)
     np.random.seed(42)
@@ -91,12 +96,12 @@ if 'initialized' not in st.session_state:
     ]
     st.session_state.initialized = True
 
-# 4. SIDEBAR (Ora parte sotto l'header)
+# 4. SIDEBAR
 with st.sidebar:
     st.write("### Navigazione")
     view = st.radio("Sezioni", ["My Watches", "Pricing Intelligence"])
     st.write("---")
-    st.caption("Intelligence SaaS v1.8")
+    st.caption("Intelligence SaaS v1.9")
 
 # 5. VIEW: MY WATCHES
 if view == "My Watches":
@@ -114,11 +119,10 @@ if view == "My Watches":
             with st.expander("Specifiche"):
                 st.write(f"**Ref:** {watch['Ref']}")
                 st.write(f"**Riserva:** {watch['Reserve']}h")
-                st.write(f"**WR:** {watch['WR']}m")
 
-# 6. VIEW: PRICING INTELLIGENCE
+# 6. VIEW: PRICING INTELLIGENCE (Compact Mode)
 elif view == "Pricing Intelligence":
-    st.header("Dynamic Pricing Matrix")
+    # Rimosso il titolo h1 per guadagnare spazio
     
     units = {"Reserve": "h", "Thickness": "mm", "WR": "m", "Freq": "vph", "Diameter": "mm"}
     
@@ -138,11 +142,11 @@ elif view == "Pricing Intelligence":
         (df_market[y_param] == target_value)
     ].copy()
 
-    st.write("---")
     if not df_filtered.empty:
         avg_p = df_filtered['Price'].mean()
         diff_pct = ((target['Price'] - avg_p) / avg_p) * 100
         
+        # KPI Section
         k1, k2, k3, k4 = st.columns(4)
         k1.metric("Categoria", target_cat)
         k2.metric("Competitor", len(df_filtered))
@@ -162,6 +166,7 @@ elif view == "Pricing Intelligence":
             template="plotly_white", height=500
         )
         fig.update_layout(
+            margin=dict(l=0, r=0, t=20, b=0), # Ridotto margine del grafico
             xaxis=dict(ticksuffix=" €", gridcolor="#f0f0f0"),
             yaxis=dict(range=[target_value * 0.8, target_value * 1.2], ticksuffix=f" {unit_y}"),
             showlegend=False
